@@ -6,6 +6,24 @@ namespace Vehicles.Api.Controllers;
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase
 {
+    // Scenario1
+    // Create new vehicle
+    // SetEngineSpecs
+    // SetGeneralInformation
+    // Publish to Catalog
+    
+    // Scenario2
+    // Find BWM vehicle
+    // RemoveEngineSpecs
+    // SetGeneralInformation
+    // Publish to Catalog
+    
+    // Scenario3
+    // Find BWM vehicle
+    // Set As Deprecated
+    // Notify Moderator
+    // Remove from catalog
+    
     private static readonly string[] Summaries = new[]
     {
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
