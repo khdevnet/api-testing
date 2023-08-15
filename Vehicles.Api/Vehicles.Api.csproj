@@ -4,10 +4,17 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <PreserveCompilationContext>true</PreserveCompilationContext>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
+        <ProjectReference Include="..\Vehicles.Core\Vehicles.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="NSwag.AspNetCore" Version="13.20.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="Vehicles.FunctionalTests" />
+    </ItemGroup>
 </Project>
