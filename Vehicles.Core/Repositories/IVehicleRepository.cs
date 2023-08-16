@@ -1,4 +1,6 @@
-﻿namespace Vehicles.Core.Repositories;
+﻿using Vehicles.Core.Entities;
+
+namespace Vehicles.Core.Repositories;
 
 public interface IVehicleRepository
 {

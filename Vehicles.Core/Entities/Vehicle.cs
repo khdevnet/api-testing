@@ -1,16 +1,10 @@
-﻿namespace Vehicles.Core;
+﻿namespace Vehicles.Core.Entities;
 
 public class Vehicle
 {
-    public Vehicle(GeneralInformation generalInformation, EngineSpecs engine, Dimensions dimensions)
-    {
-        GeneralInformation = generalInformation;
-        Engine = engine;
-        Dimensions = dimensions;
-    }
-    public GeneralInformation GeneralInformation { get; }
-    public EngineSpecs Engine { get; }
-    public Dimensions Dimensions { get; }
+    public Guid Id { get; set; }
+    public GeneralInformation GeneralInformation { get; set; }
+    public EngineSpecs Engine { get; set; }
 }
 
 // https://www.auto-data.net/en/bmw-1-series-hatchback-f40-m135i-306hp-xdrive-steptronic-42485

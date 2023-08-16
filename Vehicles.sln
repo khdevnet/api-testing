@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vehicles.ComponentTests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vehicles.Infrastructure.Data", "Vehicles.Infrastructure.Data\Vehicles.Infrastructure.Data.csproj", "{EC2C026E-2CC8-449B-AFD9-4EC1DEB46D80}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D84E6074-096B-4869-8119-DBC864899D74}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,8 @@ Global
 		{EC2C026E-2CC8-449B-AFD9-4EC1DEB46D80}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC2C026E-2CC8-449B-AFD9-4EC1DEB46D80}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC2C026E-2CC8-449B-AFD9-4EC1DEB46D80}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E112F559-2F9E-4D36-8901-115466D45B53} = {D84E6074-096B-4869-8119-DBC864899D74}
 	EndGlobalSection
 EndGlobal

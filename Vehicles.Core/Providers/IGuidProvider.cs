@@ -2,5 +2,5 @@
 
 public interface IGuidProvider
 {
-    
+    Guid New();
 }

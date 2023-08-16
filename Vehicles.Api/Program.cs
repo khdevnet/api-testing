@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Vehicles.Core;
 using Vehicles.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,8 +11,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<VehiclesContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SchoolContext")));
+builder.Services
+    .RegisterCoreLayer()
+    .RegisterDataLayer(builder.Configuration);
 
 var app = builder.Build();
 
@@ -31,4 +33,6 @@ app.MapControllers();
 
 app.Run();
 
-public partial class Program { }
+public partial class Program
+{
+}

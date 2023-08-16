@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Mvc;
 using Vehicles.Core;
+using Vehicles.Core.Entities;
 
 namespace Vehicles.Api.Controllers;
 

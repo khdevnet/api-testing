@@ -1,8 +1,14 @@
-﻿namespace Vehicles.Core;
+﻿namespace Vehicles.Core.Entities;
 
 public class EngineSpecs
 {
+    public Guid Id { get; set; }
+    public Guid VehicleId { get; set; }
+    public Vehicle? Vehicle { get; set; }
+    public string Power { get; set; }
     public string Model { get; set; }
+    public short NumberOfCylinders { get; set; }
+    public string FuelInjectionSystem { get; set; }
 }
 
 // Engine specs
