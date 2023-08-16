@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using Vehicles.Infrastructure.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,20 +8,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddOpenApiDocument();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<VehiclesContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SchoolContext")));
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    // Add OpenAPI 3.0 document serving middleware
-    // Available at: http://localhost:<port>/swagger/v1/swagger.json
-    app.UseOpenApi();
+    app.UseSwagger();
 
-    // Add web UIs to interact with the document
-    // Available at: http://localhost:<port>/swagger
-    app.UseSwaggerUi3();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();

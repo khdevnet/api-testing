@@ -9,12 +9,12 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Vehicles.Core\Vehicles.Core.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="NSwag.AspNetCore" Version="13.20.0" />
+        <ProjectReference Include="..\Vehicles.Infrastructure.Data\Vehicles.Infrastructure.Data.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <InternalsVisibleTo Include="Vehicles.FunctionalTests" />
+        <InternalsVisibleTo Include="Vehicles.ComponentTests" />
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     </ItemGroup>
 </Project>
