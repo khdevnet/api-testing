@@ -6,9 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
+using RestEase;
 using Serilog;
 using Serilog.Events;
-using Testcontainers.MsSql;
+using Vehicles.ComponentTests.Clients;
+using Vehicles.ComponentTests.Core.ComponentDependencies;
 using Vehicles.Core.Providers;
 using Vehicles.ComponentTests.Core.LightBDD;
 using WireMock.Server;
@@ -18,13 +20,13 @@ namespace Vehicles.ComponentTests.Core.WebApplication;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
-    private const string EnvironmentName = "Local";
-    private readonly MsSqlContainer _dbContainer;
+    private const string EnvironmentName = "ComponentTests";
+    private readonly MsSqlDbContainer _dbContainer;
     private readonly ITestOutputHelper? _testOutputHelper;
     private readonly Dictionary<string, string>? _testAppConfigurations;
 
     public TestWebApplicationFactory(
-        MsSqlContainer dbContainer,
+        MsSqlDbContainer dbContainer,
         ITestOutputHelper? testOutputHelper = null,
         Dictionary<string, string>? testAppConfigurations = null)
     {
@@ -32,12 +34,14 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         _dbContainer = dbContainer;
         _testOutputHelper = testOutputHelper;
         _testAppConfigurations = testAppConfigurations;
+        VehiclesClient = RestClient.For<IVehiclesClient>(CreateClientWithLogger());
     }
 
     public WireMockServer WireMockServer { get; init; }
 
     public Mock<IGuidProvider> GuidProviderMock { get; init; } = new Mock<IGuidProvider>();
 
+    public IVehiclesClient VehiclesClient { get; init; }
 
     public HttpClient CreateClientWithLogger() => CreateDefaultClient(new StepHttpLoggingHandler(new LightBDDTestLogger<StepHttpLoggingHandler>()));
 
@@ -66,7 +70,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             app.AddInMemoryCollection(
                 new Dictionary<string, string>()
                 {
-                    { "ConnectionStrings:VehiclesContext", _dbContainer.GetConnectionString() },
+                    { "ConnectionStrings:VehiclesContext", _dbContainer.DbConnectionString },
                 });
 
             if (_testAppConfigurations is not null)

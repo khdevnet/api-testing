@@ -10,6 +10,9 @@ namespace Vehicles.Api.Controllers;
 [Route("[controller]")]
 public class VehiclesController : ControllerBase
 {
+    private static readonly ConcurrentDictionary<int, Vehicle> _vehicles = new();
+    private readonly ILogger<VehiclesController> _logger;
+
     private readonly IGuidProvider _guidProvider;
     // Scenario1
     // Create new vehicle
@@ -29,17 +32,9 @@ public class VehiclesController : ControllerBase
     // Notify Moderator
     // Remove from catalog
 
-    public VehiclesController(IGuidProvider guidProvider)
+    public VehiclesController(IGuidProvider guidProvider, ILogger<VehiclesController> logger)
     {
         _guidProvider = guidProvider;
-    }
-
-    private static readonly ConcurrentDictionary<int, Vehicle> _vehicles = new();
-
-    private readonly ILogger<VehiclesController> _logger;
-
-    public VehiclesController(ILogger<VehiclesController> logger)
-    {
         _logger = logger;
 
         _vehicles.TryAdd(1, new Vehicle()
