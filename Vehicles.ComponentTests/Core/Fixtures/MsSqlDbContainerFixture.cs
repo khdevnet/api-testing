@@ -1,17 +1,13 @@
 ﻿using System.Diagnostics;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;
+using LightBDD.Core.Execution;
 using Microsoft.Data.SqlClient;
 using Testcontainers.MsSql;
 
-namespace Vehicles.ComponentTests.Core.ComponentDependencies;
+namespace Vehicles.ComponentTests.Core.Fixtures;
 
-[CollectionDefinition(nameof(MsSqlDbContainerFixture))]
-public class MsSqlDbContainerFixture : ICollectionFixture<MsSqlDbContainer>
-{
-}
-
-public class MsSqlDbContainer : IAsyncLifetime
+public class MsSqlDbContainerFixture : IGlobalResourceSetUp
 {
     private const string Password = "yourStrong(!)Password";
 
@@ -21,11 +17,11 @@ public class MsSqlDbContainer : IAsyncLifetime
 
     public MsSqlContainer Container;
 
-    public MsSqlDbContainer() => Container = CreateMsSqlContainer();
+    public MsSqlDbContainerFixture() => Container = CreateMsSqlContainer();
 
     public string DbConnectionString => _connectionStringBuilder.ConnectionString;
 
-    public async Task InitializeAsync()
+    public async Task SetUpAsync()
     {
         await Container.StartAsync();
         _connectionStringBuilder =
@@ -43,7 +39,7 @@ public class MsSqlDbContainer : IAsyncLifetime
         CreateDatabase(_connectionStringBuilder.InitialCatalog, _connectionStringBuilder.ConnectionString);
     }
 
-    public Task DisposeAsync() => Container.DisposeAsync().AsTask();
+    public Task TearDownAsync() => Container.DisposeAsync().AsTask();
 
     private MsSqlContainer CreateMsSqlContainer()
         => new MsSqlBuilder()

@@ -1,8 +1,12 @@
 ﻿using LightBDD.Core.Configuration;
+using LightBDD.Core.Dependencies;
 using LightBDD.Framework.Configuration;
 using LightBDD.Framework.Reporting.Formatters;
 using LightBDD.XUnit2;
-using Vehicles.ComponentTests.Core.LightBDD;
+using Microsoft.AspNetCore.TestHost;
+using Vehicles.ComponentTests;
+using Vehicles.ComponentTests.Core.Fixtures;
+using Vehicles.ComponentTests.Core.WebApplication;
 
 /*
  * This is a way to enable LightBDD - XUnit integration.
@@ -10,7 +14,7 @@ using Vehicles.ComponentTests.Core.LightBDD;
  * It is possible to either use [assembly:LightBddScope] directly to use LightBDD with default configuration,
  * or customize it in a way that is shown below.
  */
-[assembly: ConfiguredLightBddScope]
+[assembly: LightBddConfigurations]
 /*
  * This is a LightBDD specific, experimental attribute enabling inter-class test parallelization
  * (as long as class does not implement IClassFixture<T> nor ICollectionFixture<T> attribute
@@ -18,13 +22,13 @@ using Vehicles.ComponentTests.Core.LightBDD;
  */
 [assembly: ClassCollectionBehavior(AllowTestParallelization = true)]
 
-namespace Vehicles.ComponentTests.Core.LightBDD;
+namespace Vehicles.ComponentTests;
 
 /// <summary>
 /// This class extends LightBddScopeAttribute and allows to customize the default configuration of LightBDD.
 /// It is also possible here to override OnSetUp() and OnTearDown() methods to execute code that has to be run once, before or after all tests.
 /// </summary>
-internal class ConfiguredLightBddScopeAttribute : LightBddScopeAttribute
+internal class LightBddConfigurations : LightBddScopeAttribute
 {
     /// <summary>
     /// This method allows to customize LightBDD behavior.
@@ -34,8 +38,21 @@ internal class ConfiguredLightBddScopeAttribute : LightBddScopeAttribute
     protected override void OnConfigure(LightBddConfiguration configuration)
     {
         configuration
-            .ReportWritersConfiguration()
+            .DependencyContainerConfiguration()
+            .UseDefault(ConfigureDI);
+        
+        configuration.ExecutionExtensionsConfiguration()
+            .RegisterGlobalSetUp<MsSqlDbContainerFixture>();
+
+        configuration.ReportWritersConfiguration()
             .AddFileWriter<XmlReportFormatter>("~\\Reports\\FeaturesReport.xml")
             .AddFileWriter<PlainTextReportFormatter>("~\\Reports\\{TestDateTimeUtc:yyyy-MM-dd-HH_mm_ss}_FeaturesReport.txt");
+    }
+
+    private void ConfigureDI(IDefaultContainerConfigurator cfg)
+    {
+        cfg.RegisterType<TestWebApplicationFactory>(InstanceScope.Single);
+        cfg.RegisterType<TestAppConfigurationsProvider>(InstanceScope.Single);
+        cfg.RegisterType<MsSqlDbContainerFixture>(InstanceScope.Single);
     }
 }

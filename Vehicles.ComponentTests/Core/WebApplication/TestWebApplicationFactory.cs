@@ -10,30 +10,22 @@ using RestEase;
 using Serilog;
 using Serilog.Events;
 using Vehicles.ComponentTests.Clients;
-using Vehicles.ComponentTests.Core.ComponentDependencies;
 using Vehicles.Core.Providers;
 using Vehicles.ComponentTests.Core.LightBDD;
 using WireMock.Server;
-using Xunit.Abstractions;
 
 namespace Vehicles.ComponentTests.Core.WebApplication;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
     private const string EnvironmentName = "ComponentTests";
-    private readonly MsSqlDbContainer _dbContainer;
-    private readonly ITestOutputHelper? _testOutputHelper;
-    private readonly Dictionary<string, string>? _testAppConfigurations;
+    private readonly TestAppConfigurationsProvider _testAppConfigurationsProvider;
 
     public TestWebApplicationFactory(
-        MsSqlDbContainer dbContainer,
-        ITestOutputHelper? testOutputHelper = null,
-        Dictionary<string, string>? testAppConfigurations = null)
+        TestAppConfigurationsProvider testAppConfigurationsProvider)
     {
         WireMockServer = WireMockServer.Start();
-        _dbContainer = dbContainer;
-        _testOutputHelper = testOutputHelper;
-        _testAppConfigurations = testAppConfigurations;
+        _testAppConfigurationsProvider = testAppConfigurationsProvider;
         VehiclesClient = RestClient.For<IVehiclesClient>(CreateClientWithLogger());
     }
 
@@ -61,21 +53,16 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
     {
         base.ConfigureWebHost(builder);
 
-        SetTestOutputLogger(builder, _testOutputHelper);
+        SetLogger(builder);
 
         builder.UseEnvironment(EnvironmentName);
         builder.UseContentRoot(Directory.GetCurrentDirectory());
         builder.ConfigureAppConfiguration(app =>
         {
-            app.AddInMemoryCollection(
-                new Dictionary<string, string>()
-                {
-                    { "ConnectionStrings:VehiclesContext", _dbContainer.DbConnectionString },
-                });
-
-            if (_testAppConfigurations is not null)
+            IDictionary<string, string> appConfigurationOverrides = _testAppConfigurationsProvider.Get();
+            if (appConfigurationOverrides.Any())
             {
-                app.AddInMemoryCollection(_testAppConfigurations);
+                app.AddInMemoryCollection(appConfigurationOverrides);
             }
         });
         builder.ConfigureTestServices(services =>
@@ -85,16 +72,13 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         });
     }
 
-    private static void SetTestOutputLogger(IWebHostBuilder builder, ITestOutputHelper? testOutputHelper)
+    private static void SetLogger(IWebHostBuilder builder)
     {
-        if (testOutputHelper is not null)
+        builder.UseSerilog((_, loggerConfiguration) =>
         {
-            builder.UseSerilog((_, loggerConfiguration) =>
-            {
-                loggerConfiguration.MinimumLevel.Is(LogEventLevel.Verbose);
-                loggerConfiguration.Enrich.FromLogContext();
-                loggerConfiguration.WriteTo.TestOutput(testOutputHelper, outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Properties:j}{NewLine}{Exception}{NewLine}");
-            });
-        }
+            loggerConfiguration.MinimumLevel.Is(LogEventLevel.Verbose);
+            loggerConfiguration.Enrich.FromLogContext();
+            loggerConfiguration.WriteTo.File(Path.Combine(Directory.GetCurrentDirectory(), "VehiclesApiTestLogs.txt"), rollingInterval: RollingInterval.Day, outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Properties:j}{NewLine}{Exception}{NewLine}");
+        });
     }
 }

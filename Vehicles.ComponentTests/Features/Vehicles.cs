@@ -1,36 +1,20 @@
-using Features.Common;
-using LightBDD.Core.Dependencies;
+using LightBDD.Framework.Scenarios;
 using LightBDD.XUnit2;
-using Vehicles.ComponentTests;
-using Vehicles.ComponentTests.Core.ComponentDependencies;
 using Vehicles.ComponentTests.Features;
-using Xunit.Abstractions;
 
 namespace Features;
 
-[Collection(nameof(MsSqlDbContainerFixture))]
-public class Vehicles : BaseComponentTest
+public class Vehicles : FeatureFixture
 {
-    private readonly MsSqlDbContainer _msSqlDbContainer;
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public Vehicles(MsSqlDbContainer msSqlDbContainer, ITestOutputHelper testOutputHelper)
-        : base(msSqlDbContainer, testOutputHelper)
-    {
-        _msSqlDbContainer = msSqlDbContainer;
-        _testOutputHelper = testOutputHelper;
-    }
-
     [Scenario]
     public async Task Get_vehicles()
     {
-        await RunScenarioAsync<Vehicles_steps>(
-            _ => _.When_get_vehicles(),
-            _ => _.Then_response_is_ok());
+        await Runner
+            .WithContext<Vehicles_steps>()
+            .RunScenarioAsync(
+                _ => _.When_get_vehicles(),
+                _ => _.Then_response_is_ok());
     }
-
-    protected override object CreateFeatureContext(IDependencyResolver x)
-        => new Vehicles_steps(App);
 
     //
     // private static void SeedEngineSpecs(ModelBuilder modelBuilder)
