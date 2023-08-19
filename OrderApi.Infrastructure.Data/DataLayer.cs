@@ -13,7 +13,7 @@ public static class DataLayer
 
         serviceCollection.AddScoped<IOrderRepository, OrderRepository>();
         serviceCollection.AddDbContext<OrdersContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("SchoolContext")));
+            options.UseSqlServer(configuration.GetConnectionString("OrdersContext")));
         return serviceCollection;
     }
 }

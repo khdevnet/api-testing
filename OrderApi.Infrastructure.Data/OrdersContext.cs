@@ -15,6 +15,15 @@ public class OrdersContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Order>()
-            .HasKey(b => b.Id);
+        .HasKey(b => b.Id);
+
+        modelBuilder.Entity<Order>()
+        .HasMany(e => e.Products)
+        .WithOne(e => e.Order)
+        .HasForeignKey(e => e.OrderId)
+        .IsRequired();
+
+        modelBuilder.Entity<Product>()
+           .HasKey(b => b.Name);
     }
 }

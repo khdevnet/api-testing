@@ -35,7 +35,7 @@ public class OrderStatusHandler : IHandleMessages<ApproveOrderCommand>, IHandleM
 
         foreach (var product in order.Products)
         {
-            await _bus.Publish(new OrderProductDispatchEvent { OrderId = order.Id, Product = product });
+            await _bus.Publish(new OrderProductDispatchEvent { OrderId = order.Id, Product = product.Name });
         }
     }
 

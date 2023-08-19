@@ -38,14 +38,12 @@ public class OrdersController : ControllerBase
         {
             return BadRequest("Invalid account");
         }
+        var orderId = Guid.NewGuid();
 
-        var order = new Order
-        {
-            Id = Guid.NewGuid(),
-            AccountId = request.AccountId,
-            Products = request.Products,
-            Status = OrderStatus.Created
-        };
+        var order = new Order(orderId, request.AccountId)
+            .AddProducts(request.Products);
+
+
 
         await _repository.AddAsync(order);
 

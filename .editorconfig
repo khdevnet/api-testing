@@ -603,6 +603,11 @@ dotnet_diagnostic.IDE0058.severity = silent
 csharp_using_directive_placement = outside_namespace:silent
 csharp_prefer_simple_using_statement = true:suggestion
 csharp_style_expression_bodied_local_functions = false:silent
+csharp_style_prefer_method_group_conversion = true:silent
+csharp_style_prefer_top_level_statements = true:silent
+
+[OrderApi.Infrastructure.Data/Migrations/*.cs]
+generated_code = true
 
 [src/CodeStyle/**.{cs,vb}]
 # warning RS0005: Do not use generic CodeAction.Create to create CodeAction

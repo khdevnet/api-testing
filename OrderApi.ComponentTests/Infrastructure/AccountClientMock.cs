@@ -9,15 +9,15 @@ namespace OrderApi.ComponentTests.Infrastructure;
 /// <summary>
 /// Mock Account Service to control Account Service API calls
 /// </summary>
-public class MockAccountService : IDisposable
+public class AccountClientMock : IDisposable
 {
     private const int AccountServicePort = 5002;
     private readonly WireMockServer _server;
 
-    public MockAccountService()
+    public AccountClientMock()
         => _server = WireMockServer.Start(AccountServicePort, true);
 
-    public void ConfigureGetAccount(Guid accountId, bool response)
+    public void SetupGetAccount(Guid accountId, bool response)
     {
         _server.Given(Request.Create().UsingGet().WithPath($"/accounts/{accountId}/validate"))
             .RespondWith(Response.Create().WithStatusCode(HttpStatusCode.OK).WithBodyAsJson(response));

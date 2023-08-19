@@ -3,7 +3,7 @@ using LightBDD.Core.Dependencies;
 using LightBDD.XUnit2;
 using OrderApi.ComponentTests;
 using OrderApi.ComponentTests.Core.Fixtures;
-using Vehicles.ComponentTests.Core.WebApplication;
+using OrderApi.ComponentTests.Core.WebApplication;
 
 [assembly: ClassCollectionBehavior(AllowTestParallelization = true)]
 [assembly: ConfiguredLightBddScope]

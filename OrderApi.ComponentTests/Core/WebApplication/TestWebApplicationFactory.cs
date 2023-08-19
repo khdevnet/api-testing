@@ -5,31 +5,35 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using OrderApi;
+using OrderApi.ComponentTests.Clients;
 using OrderApi.ComponentTests.Core.LightBDD;
-using OrderApi.ComponentTests.Core.WebApplication;
+using OrderApi.ComponentTests.Infrastructure;
+using RestEase;
 using Serilog;
 using Serilog.Events;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using Vehicles.ComponentTests.Core.LightBDD;
 using WireMock.Server;
 
-namespace Vehicles.ComponentTests.Core.WebApplication;
+namespace OrderApi.ComponentTests.Core.WebApplication;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
     private const string EnvironmentName = "ComponentTests";
     private readonly TestAppConfigurationsProvider _testAppConfigurationsProvider;
 
+    public IOrdersClient OrdersClient { get; private set; }
+    public AccountClientMock AccountClientMock { get; private set; }
+
     public TestWebApplicationFactory(
         TestAppConfigurationsProvider testAppConfigurationsProvider)
     {
         WireMockServer = WireMockServer.Start();
         _testAppConfigurationsProvider = testAppConfigurationsProvider;
-        //VehiclesClient = RestClient.For<IVehiclesClient>(CreateClientWithLogger());
+        OrdersClient = RestClient.For<IOrdersClient>(CreateClientWithLogger());
+        AccountClientMock = new AccountClientMock();
     }
 
     public WireMockServer WireMockServer { get; init; }
@@ -61,7 +65,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         builder.UseContentRoot(Directory.GetCurrentDirectory());
         builder.ConfigureAppConfiguration(app =>
         {
-            IDictionary<string, string> appConfigurationOverrides = _testAppConfigurationsProvider.Get();
+            var appConfigurationOverrides = _testAppConfigurationsProvider.Get();
             if (appConfigurationOverrides.Any())
             {
                 app.AddInMemoryCollection(appConfigurationOverrides);
