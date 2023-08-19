@@ -1,6 +1,5 @@
 ﻿using OrderApi.Core.Domain;
 using OrderApi.Core.Repositories;
-using Vehicles.Infrastructure.Data;
 
 namespace OrderApi.Infrastructure.Data.Repositories;
 

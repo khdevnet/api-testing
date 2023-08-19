@@ -13,7 +13,7 @@ using Rebus.Config;
 using Rebus.Persistence.FileSystem;
 using Rebus.Routing.TypeBased;
 using Rebus.Transport.FileSystem;
-using Vehicles.Infrastructure.Data;
+using OrderApi.Infrastructure.Data;
 
 namespace OrderApi;
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OrderApi.Core.Domain;
 
-namespace Vehicles.Infrastructure.Data;
+namespace OrderApi.Infrastructure.Data;
 
 public class OrdersContext : DbContext
 {

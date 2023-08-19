@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using OrderApi.Core.Repositories;
 using OrderApi.Infrastructure.Data.Repositories;
 
-namespace Vehicles.Infrastructure.Data;
+namespace OrderApi.Infrastructure.Data;
 
 public static class DataLayer
 {
