@@ -12,18 +12,15 @@ public class AccountServiceMock : IGlobalResourceSetUp
 {
     private WireMockServer _server;
 
-    public void SetupGetAccount(Guid accountId, bool response)
-    {
+    public void SetupGetAccount(Guid accountId, bool response) =>
         _server.Given(Request.Create().UsingGet().WithPath($"/accounts/{accountId}/validate"))
             .RespondWith(Response.Create().WithStatusCode(HttpStatusCode.OK).WithBodyAsJson(response));
-    }
 
     public string GetUrl() => _server.Url;
 
     public Task SetUpAsync()
     {
         _server = WireMockServer.Start();
-
         return Task.CompletedTask;
     }
     public Task TearDownAsync()

@@ -7,23 +7,22 @@ public class OrdersContext : DbContext
 {
     public OrdersContext(DbContextOptions<OrdersContext> options)
         : base(options)
-    {
-    }
+        => Orders = Set<Order>();
 
     public DbSet<Order> Orders { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Order>()
-        .HasKey(b => b.Id);
+            .HasKey(b => b.Id);
 
         modelBuilder.Entity<Order>()
-        .HasMany(e => e.Products)
-        .WithOne(e => e.Order)
-        .HasForeignKey(e => e.OrderId)
-        .IsRequired();
+            .HasMany(e => e.Products)
+            .WithOne(e => e.Order)
+            .HasForeignKey(e => e.OrderId)
+            .IsRequired();
 
         modelBuilder.Entity<Product>()
-           .HasKey(b => b.Name);
+            .HasKey(b => b.Name);
     }
 }

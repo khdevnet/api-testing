@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using OrderApi.ComponentTests.Application.Clients;
 using OrderApi.ComponentTests.Application.Infrastructure;
-using OrderApi.ComponentTests.Infrastructure;
 using OrderApi.ComponentTests.LightBDD;
 using RestEase;
 using Serilog;
@@ -79,13 +78,11 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         });
     }
 
-    private static void SetLogger(IWebHostBuilder builder)
-    {
+    private static void SetLogger(IWebHostBuilder builder) =>
         builder.UseSerilog((_, loggerConfiguration) =>
         {
             loggerConfiguration.MinimumLevel.Is(LogEventLevel.Verbose);
             loggerConfiguration.Enrich.FromLogContext();
             loggerConfiguration.WriteTo.File(Path.Combine(Directory.GetCurrentDirectory(), "VehiclesApiTestLogs.txt"), rollingInterval: RollingInterval.Day, outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Properties:j}{NewLine}{Exception}{NewLine}");
         });
-    }
 }

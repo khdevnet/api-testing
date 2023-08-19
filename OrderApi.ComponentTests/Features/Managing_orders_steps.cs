@@ -13,7 +13,6 @@ using OrderApi.Core.Domain;
 using OrderApi.Models;
 using Xunit;
 using OrderApi.ComponentTests.Application.Infrastructure;
-using OrderApi.ComponentTests.Infrastructure;
 using OrderApi.Core.Messages;
 using SharedKernal;
 using OrderApi.Messages;
@@ -82,16 +81,14 @@ internal class Managing_orders_steps : IDisposable
         status.SetActual(order!.Status);
     }
 
-    public Task<CompositeStep> Given_a_created_order()
-    {
-        return Task.FromResult(CompositeStep.DefineNew()
+    public Task<CompositeStep> Given_a_created_order() =>
+        Task.FromResult(CompositeStep.DefineNew()
             .AddAsyncSteps(
                 _ => Given_a_valid_account(),
                 _ => When_create_order_endpoint_is_called_for_products("Product-A", "Product-B", "Product-C"),
                 _ => Then_response_should_have_status(HttpStatusCode.Created),
                 _ => Then_response_should_contain_order())
             .Build());
-    }
 
     public async Task When_RejectOrderCommand_is_sent_for_this_order()
     {

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using LightBDD.Framework.Messaging;
 using SharedKernal;
 
-namespace OrderApi.ComponentTests.Infrastructure;
+namespace OrderApi.ComponentTests.Application.Infrastructure;
 
 internal class MessageBusMock : IBus, IMessageSource
 {
