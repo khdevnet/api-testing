@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace Vehicles.ComponentTests.Core.LightBDD;
+namespace OrderApi.ComponentTests.LightBDD;
 
 public class StepHttpLoggingHandler : DelegatingHandler
 {
@@ -36,7 +36,7 @@ public class StepHttpLoggingHandler : DelegatingHandler
         return JsonConvert.SerializeObject(properties, Formatting.Indented);
     }
 
-    private static async Task<string> GetBodyAsync(HttpContent? content)
+    private static async Task<string> GetBodyAsync(HttpContent content)
         => content == null ? string.Empty : await content.ReadAsStringAsync();
 
     private async Task LogRequestAsync(string message, HttpRequestMessage request)

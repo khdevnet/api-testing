@@ -5,9 +5,9 @@ using LightBDD.Core.Execution;
 using Microsoft.Data.SqlClient;
 using Testcontainers.MsSql;
 
-namespace OrderApi.ComponentTests.Core.Fixtures;
+namespace OrderApi.ComponentTests.Application.Infrastructure;
 
-public class MsSqlDbContainerFixture : IGlobalResourceSetUp
+public class MsSqlDbContainerMock : IGlobalResourceSetUp
 {
     private const string Password = "yourStrong(!)Password";
 
@@ -15,7 +15,7 @@ public class MsSqlDbContainerFixture : IGlobalResourceSetUp
 
     public MsSqlContainer Container;
 
-    public MsSqlDbContainerFixture() => Container = CreateMsSqlContainer();
+    public MsSqlDbContainerMock() => Container = CreateMsSqlContainer();
 
     public string DbConnectionString => _connectionStringBuilder.ConnectionString;
 

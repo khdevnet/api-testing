@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using OrderApi.Clients;
 using OrderApi.Core.Domain;
+using OrderApi.Core.ExternalServices;
+using OrderApi.Core.Messages;
 using OrderApi.Core.Repositories;
-using OrderApi.Messages;
 using OrderApi.Models;
-using Rebus.Bus;
+using SharedKernal;
 
 namespace OrderApi.Controllers;
 
@@ -17,11 +17,11 @@ namespace OrderApi.Controllers;
 [Route("[controller]")]
 public class OrdersController : ControllerBase
 {
-    private readonly AccountServiceClient _accountServiceClient;
+    private readonly IAccountServiceClient _accountServiceClient;
     private readonly IBus _bus;
     private readonly IOrderRepository _repository;
 
-    public OrdersController(AccountServiceClient accountServiceClient, IBus bus, IOrderRepository repository)
+    public OrdersController(IAccountServiceClient accountServiceClient, IBus bus, IOrderRepository repository)
     {
         _accountServiceClient = accountServiceClient;
         _bus = bus;
@@ -43,13 +43,12 @@ public class OrdersController : ControllerBase
         var order = new Order(orderId, request.AccountId)
             .AddProducts(request.Products);
 
-
-
         await _repository.AddAsync(order);
 
+        // Outbox pattern should use there
         await _bus.Publish(new OrderCreatedEvent { OrderId = order.Id });
 
-        return CreatedAtAction("GetById", new { orderId = order.Id }, order);
+        return CreatedAtAction(nameof(GetById), new { orderId = order.Id }, order);
     }
 
     /// <summary>

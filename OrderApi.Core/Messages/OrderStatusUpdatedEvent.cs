@@ -1,7 +1,6 @@
-﻿using System;
-using OrderApi.Core.Domain;
+﻿using OrderApi.Core.Domain;
 
-namespace OrderApi.Messages;
+namespace OrderApi.Core.Messages;
 
 public record OrderStatusUpdatedEvent
 {

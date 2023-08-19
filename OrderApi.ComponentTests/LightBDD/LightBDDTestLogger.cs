@@ -1,9 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Vehicles.ComponentTests.Core.LightBDD;
 
-namespace OrderApi.ComponentTests.Core.LightBDD;
+namespace OrderApi.ComponentTests.LightBDD;
 
 public class LightBDDTestLogger<TCategoryName> : ILogger<TCategoryName>
 {

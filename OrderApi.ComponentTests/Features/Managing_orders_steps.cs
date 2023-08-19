@@ -1,41 +1,45 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using FluentAssertions;
 using LightBDD.Framework;
 using LightBDD.Framework.Messaging;
 using LightBDD.Framework.Parameters;
 using LightBDD.Framework.Scenarios;
-using OrderApi.ComponentTests.Clients;
-using OrderApi.ComponentTests.Core.WebApplication;
-using OrderApi.ComponentTests.Infrastructure;
+using OrderApi.ComponentTests.Application.Clients;
+using OrderApi.ComponentTests.Application;
 using OrderApi.Core.Domain;
-using OrderApi.Messages;
 using OrderApi.Models;
 using Xunit;
+using OrderApi.ComponentTests.Application.Infrastructure;
+using OrderApi.ComponentTests.Infrastructure;
+using OrderApi.Core.Messages;
+using SharedKernal;
+using OrderApi.Messages;
 
 namespace Features;
 
 internal class Managing_orders_steps : IDisposable
 {
-    private readonly AccountClientMock _accountService;
-    //private readonly IBus _messageBus;
+    private readonly AccountServiceMock _accountService;
     private readonly MessageListener _listener;
     private readonly IOrdersClient _client;
     private readonly Guid _accountId = Guid.NewGuid();
     private HttpResponseMessage _response;
     private Order _order;
 
+    public TestWebApplicationFactory App { get; }
+
     // Uses DI container to resolve these dependencies
-    public Managing_orders_steps(TestWebApplicationFactory testWebApplicationFactory)
+    public Managing_orders_steps(
+        TestWebApplicationFactory app,
+        MessageBusMock messageBusMock)
     {
-        _client = testWebApplicationFactory.OrdersClient;
-        _accountService = testWebApplicationFactory.AccountClientMock;
-        //_messageBus = testBus.MessageBus;
-        //_listener = MessageListener.Start(testBus.Dispatcher);
+        _client = app.OrdersClient;
+        _accountService = app.AccountClientMock;
+        _listener = MessageListener.Start(messageBusMock);
+        App = app;
     }
 
     public Task Given_a_valid_account()
@@ -68,8 +72,8 @@ internal class Managing_orders_steps : IDisposable
         Assert.NotEqual(Guid.Empty, _order?.Id);
     }
 
-    public Task Then_OrderCreatedEvent_should_be_published()
-        => Task.CompletedTask;// await _listener.EnsureReceived<OrderCreatedEvent>(x => x.OrderId == _order.Id);
+    public async Task Then_OrderCreatedEvent_should_be_published()
+        => await _listener.EnsureReceived<OrderCreatedEvent>(x => x.OrderId == _order.Id);
 
     public async Task Then_get_order_endpoint_should_return_order_with_status(Verifiable<OrderStatus> status)
     {
@@ -89,21 +93,20 @@ internal class Managing_orders_steps : IDisposable
             .Build());
     }
 
-    public Task When_RejectOrderCommand_is_sent_for_this_order()
-        => Task.CompletedTask;// await _messageBus.Send(new RejectOrderCommand { OrderId = _order.Id });
-
-    public Task When_ApproveOrderCommand_is_sent_for_this_order()
-        => Task.CompletedTask;// await _messageBus.Send(new ApproveOrderCommand { OrderId = _order.Id });
-
-    public Task Then_OrderStatusUpdatedEvent_should_be_published_with_status(OrderStatus _)
-        => Task.CompletedTask;// await _listener.EnsureReceived<OrderStatusUpdatedEvent>(x => x.OrderId == _order.Id && x.Status == status);
-
-    public async Task Then_OrderProductDispatchEvent_should_be_published_for_each_product()
+    public async Task When_RejectOrderCommand_is_sent_for_this_order()
     {
-        var messages = await _listener.EnsureReceivedMany<OrderProductDispatchEvent>(_order.Products.Count(), x => x.OrderId == _order.Id);
-        messages.Select(m => m.Product).ToArray()
-            .Should().NotBeEmpty();
+        var handler = App.RetrieveScopedService<IHandleMessages<RejectOrderCommand>>();
+        await handler.Handle(new RejectOrderCommand { OrderId = _order.Id });
     }
+
+    public async Task When_ApproveOrderCommand_is_sent_for_this_order()
+    {
+        var handler = App.RetrieveScopedService<IHandleMessages<ApproveOrderCommand>>();
+        await handler.Handle(new ApproveOrderCommand { OrderId = _order.Id });
+    }
+
+    public async Task Then_OrderStatusUpdatedEvent_should_be_published_with_status(OrderStatus status)
+        => await _listener.EnsureReceived<OrderStatusUpdatedEvent>(x => x.OrderId == _order.Id && x.Status == status);
 
     public void Dispose()
         => _listener?.Dispose();

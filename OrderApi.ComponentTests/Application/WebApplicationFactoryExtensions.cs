@@ -1,21 +1,18 @@
 ﻿using System;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace OrderApi.ComponentTests.Core.WebApplication;
+namespace OrderApi.ComponentTests.Application;
 
 public static class WebApplicationFactoryExtensions
 {
-    public static TService RetrieveService<TStartup, TService>(this WebApplicationFactory<TStartup> factory)
-        where TStartup : class
+    public static TService RetrieveService<TService>(this TestWebApplicationFactory factory)
         where TService : class
         => factory.Services.GetService<TService>();
 
-    public static TMessageHandler RetrieveScopedService<TStartup, TMessageHandler>(this WebApplicationFactory<TStartup> factory)
-        where TStartup : class
+    public static TMessageHandler RetrieveScopedService<TMessageHandler>(this TestWebApplicationFactory factory)
         where TMessageHandler : class
     {
-        var serviceScopeFactory = factory.RetrieveService<TStartup, IServiceScopeFactory>();
+        var serviceScopeFactory = factory.RetrieveService<IServiceScopeFactory>();
 
         if (serviceScopeFactory is null)
             throw new Exception($"Failed to retrieve {nameof(IServiceScopeFactory)} from provided WebApplicationFactory.");

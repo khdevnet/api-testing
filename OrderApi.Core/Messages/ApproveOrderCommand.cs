@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace OrderApi.Messages;
+﻿namespace OrderApi.Core.Messages;
 
 public record ApproveOrderCommand
 {

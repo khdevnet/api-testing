@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using OrderApi.Models;
 using RestEase;
 
-namespace OrderApi.ComponentTests.Clients;
+namespace OrderApi.ComponentTests.Application.Clients;
 
 [BasePath("orders")]
 [AllowAnyStatusCode]

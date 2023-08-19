@@ -13,15 +13,14 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Rebus" />
-    <PackageReference Include="Rebus.AzureServiceBus" />
-    <PackageReference Include="Rebus.ServiceProvider" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\OrderApi.Core\OrderApi.Core.csproj" />
     <ProjectReference Include="..\OrderApi.Infrastructure.Data\OrderApi.Infrastructure.Data.csproj" />
+    <ProjectReference Include="..\OrderApi.Infrastructure.ExternalServices\OrderApi.Infrastructure.ExternalServices.csproj" />
+    <ProjectReference Include="..\SharedKernal\SharedKernal.csproj" />
   </ItemGroup>
 
 </Project>

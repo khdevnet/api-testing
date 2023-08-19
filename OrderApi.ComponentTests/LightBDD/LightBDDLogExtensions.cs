@@ -2,7 +2,7 @@
 using LightBDD.Framework;
 using Newtonsoft.Json;
 
-namespace Vehicles.ComponentTests.Core.LightBDD;
+namespace OrderApi.ComponentTests.LightBDD;
 
 public static class LightBDDLogExtensions
 {

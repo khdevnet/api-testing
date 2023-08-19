@@ -1,11 +1,9 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
+﻿using System.Net.Http.Json;
+using OrderApi.Core.ExternalServices;
 
-namespace OrderApi.Clients;
+namespace OrderApi.Infrastructure.ExternalServices;
 
-public class AccountServiceClient
+internal class AccountServiceClient : IAccountServiceClient
 {
     private readonly HttpClient _client;
 

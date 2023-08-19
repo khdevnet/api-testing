@@ -2,8 +2,8 @@
 using LightBDD.Core.Dependencies;
 using LightBDD.XUnit2;
 using OrderApi.ComponentTests;
-using OrderApi.ComponentTests.Core.Fixtures;
-using OrderApi.ComponentTests.Core.WebApplication;
+using OrderApi.ComponentTests.Application;
+using OrderApi.ComponentTests.Application.Infrastructure;
 
 [assembly: ClassCollectionBehavior(AllowTestParallelization = true)]
 [assembly: ConfiguredLightBddScope]
@@ -18,12 +18,15 @@ internal class ConfiguredLightBddScopeAttribute : LightBddScopeAttribute
             .UseDefault(ConfigureDI);
 
         configuration.ExecutionExtensionsConfiguration()
-            .RegisterGlobalSetUp<MsSqlDbContainerFixture>();
+            .RegisterGlobalSetUp<MsSqlDbContainerMock>()
+            .RegisterGlobalSetUp<AccountServiceMock>();
     }
 
     private void ConfigureDI(IDefaultContainerConfigurator cfg)
     {
         cfg.RegisterType<TestWebApplicationFactory>(InstanceScope.Single);
-        cfg.RegisterType<MsSqlDbContainerFixture>(InstanceScope.Single);
+        cfg.RegisterType<TestAppConfigurationsProvider>(InstanceScope.Single);
+        cfg.RegisterType<MsSqlDbContainerMock>(InstanceScope.Single);
+        cfg.RegisterType<AccountServiceMock>(InstanceScope.Single);
     }
 }

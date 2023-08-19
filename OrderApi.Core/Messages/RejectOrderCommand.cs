@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace OrderApi.Messages;
+﻿namespace OrderApi.Messages;
 
 public record RejectOrderCommand
 {
