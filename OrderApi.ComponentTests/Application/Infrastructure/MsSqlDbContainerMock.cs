@@ -25,7 +25,7 @@ public class MsSqlDbContainerMock : IGlobalResourceSetUp
         _connectionStringBuilder =
             new SqlConnectionStringBuilder(@$"
                     Server=tcp:localhost,{Container.GetMappedPublicPort(1433)};
-                    Initial Catalog=Vehicles;
+                    Initial Catalog=Orders;
                     Persist Security Info=False;
                     User ID=sa;
                     Password={Password};

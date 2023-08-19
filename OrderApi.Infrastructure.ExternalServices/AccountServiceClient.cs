@@ -9,5 +9,6 @@ internal class AccountServiceClient : IAccountServiceClient
 
     public AccountServiceClient(HttpClient client) => _client = client;
 
-    public async Task<bool> IsValidAccount(Guid accountId) => await _client.GetFromJsonAsync<bool>($"/accounts/{accountId}/validate");
+    public async Task<bool> IsValidAccount(Guid accountId)
+        => await _client.GetFromJsonAsync<bool>($"/accounts/{accountId}/validate");
 }

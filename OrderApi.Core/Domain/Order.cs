@@ -2,7 +2,7 @@
 
 public record Order
 {
-    private readonly List<Product> _products = new();
+    private readonly List<OrderProduct> _products = new();
 
     public Order(Guid id, Guid accountId)
     {
@@ -17,13 +17,13 @@ public record Order
 
     public Guid AccountId { get; init; }
 
-    public IEnumerable<Product> Products => _products.AsReadOnly();
+    public IEnumerable<OrderProduct> Products => _products.AsReadOnly();
 
     public OrderStatus Status { get; init; }
 
     public Order AddProducts(IEnumerable<string> products)
     {
-        products.Select(p => new Product(Id, p, this))
+        products.Select(p => new OrderProduct(Id, p))
             .ToList().ForEach(_products.Add);
 
         return this;

@@ -25,17 +25,17 @@ namespace OrderApi.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Product",
+                name: "OrderProduct",
                 columns: table => new
                 {
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Product", x => x.Name);
+                    table.PrimaryKey("PK_OrderProduct", x => new { x.Name, x.OrderId });
                     table.ForeignKey(
-                        name: "FK_Product_Orders_OrderId",
+                        name: "FK_OrderProduct_Orders_OrderId",
                         column: x => x.OrderId,
                         principalTable: "Orders",
                         principalColumn: "Id",
@@ -43,8 +43,8 @@ namespace OrderApi.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_OrderId",
-                table: "Product",
+                name: "IX_OrderProduct_OrderId",
+                table: "OrderProduct",
                 column: "OrderId");
         }
 
@@ -52,7 +52,7 @@ namespace OrderApi.Infrastructure.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Product");
+                name: "OrderProduct");
 
             migrationBuilder.DropTable(
                 name: "Orders");

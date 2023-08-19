@@ -17,7 +17,7 @@ public class TestAppConfigurationsProvider
     public IDictionary<string, string> Get()
         => new Dictionary<string, string>()
         {
-            { "ConnectionStrings:VehiclesContext", _dbContainerFixture.DbConnectionString },
-            { "Clients:Account", _accountServiceMock.GetUrl() }
+            { "ConnectionStrings:OrdersContext", _dbContainerFixture.DbConnectionString },
+            { "Clients:AccountService", _accountServiceMock.GetUrl() }
         };
 }

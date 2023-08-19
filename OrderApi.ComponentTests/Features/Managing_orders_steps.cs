@@ -85,7 +85,7 @@ internal class Managing_orders_steps : IDisposable
         Task.FromResult(CompositeStep.DefineNew()
             .AddAsyncSteps(
                 _ => Given_a_valid_account(),
-                _ => When_create_order_endpoint_is_called_for_products("Product-A", "Product-B", "Product-C"),
+                _ => When_create_order_endpoint_is_called_for_products("OrderProduct-A", "OrderProduct-B", "OrderProduct-C"),
                 _ => Then_response_should_have_status(HttpStatusCode.Created),
                 _ => Then_response_should_contain_order())
             .Build());

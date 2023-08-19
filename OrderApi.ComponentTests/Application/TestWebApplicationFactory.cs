@@ -22,16 +22,20 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
     private const string EnvironmentName = "ComponentTests";
     private readonly TestAppConfigurationsProvider _testAppConfigurationsProvider;
+    private readonly MessageBusMock _messageBusMock;
 
     public IOrdersClient OrdersClient { get; private set; }
     public AccountServiceMock AccountClientMock { get; private set; }
 
     public TestWebApplicationFactory(
         TestAppConfigurationsProvider testAppConfigurationsProvider,
-        AccountServiceMock accountClientMock)
+        AccountServiceMock accountClientMock,
+        MessageBusMock messageBusMock
+    )
     {
         WireMockServer = WireMockServer.Start();
         _testAppConfigurationsProvider = testAppConfigurationsProvider;
+        _messageBusMock = messageBusMock;
         AccountClientMock = accountClientMock;
         OrdersClient = RestClient.For<IOrdersClient>(CreateClientWithLogger());
     }
@@ -39,7 +43,6 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
     public WireMockServer WireMockServer { get; init; }
 
     // public Mock<IGuidProvider> GuidProviderMock { get; init; } = new Mock<IGuidProvider>();
-
 
     public HttpClient CreateClientWithLogger() => CreateDefaultClient(new StepHttpLoggingHandler(new LightBDDTestLogger<StepHttpLoggingHandler>()));
 
@@ -52,6 +55,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
     protected override TestServer CreateServer(IWebHostBuilder builder)
     {
         var server = base.CreateServer(builder);
+
         return server;
     }
 
@@ -63,18 +67,21 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
         builder.UseEnvironment(EnvironmentName);
         builder.UseContentRoot(Directory.GetCurrentDirectory());
+
         builder.ConfigureAppConfiguration(app =>
         {
             var appConfigurationOverrides = _testAppConfigurationsProvider.Get();
+
             if (appConfigurationOverrides.Any())
             {
                 app.AddInMemoryCollection(appConfigurationOverrides);
             }
         });
+
         builder.ConfigureTestServices(services =>
         {
             services.RemoveAll<IBus>();
-            services.AddScoped<IBus, MessageBusMock>();
+            services.AddScoped<IBus>(_ => _messageBusMock);
         });
     }
 
@@ -83,6 +90,8 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         {
             loggerConfiguration.MinimumLevel.Is(LogEventLevel.Verbose);
             loggerConfiguration.Enrich.FromLogContext();
-            loggerConfiguration.WriteTo.File(Path.Combine(Directory.GetCurrentDirectory(), "VehiclesApiTestLogs.txt"), rollingInterval: RollingInterval.Day, outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Properties:j}{NewLine}{Exception}{NewLine}");
+
+            loggerConfiguration.WriteTo.File(Path.Combine(Directory.GetCurrentDirectory(), "OrdersApiTestLogs.txt"), rollingInterval: RollingInterval.Day,
+                outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Properties:j}{NewLine}{Exception}{NewLine}");
         });
 }

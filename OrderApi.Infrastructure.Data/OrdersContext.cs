@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OrderApi.Core.Domain;
+#pragma warning disable CS8618
 
 namespace OrderApi.Infrastructure.Data;
 
@@ -7,7 +8,8 @@ public class OrdersContext : DbContext
 {
     public OrdersContext(DbContextOptions<OrdersContext> options)
         : base(options)
-        => Orders = Set<Order>();
+    {
+    }
 
     public DbSet<Order> Orders { get; set; }
 
@@ -22,7 +24,7 @@ public class OrdersContext : DbContext
             .HasForeignKey(e => e.OrderId)
             .IsRequired();
 
-        modelBuilder.Entity<Product>()
-            .HasKey(b => b.Name);
+        modelBuilder.Entity<OrderProduct>()
+            .HasKey(nameof(OrderProduct.Name), nameof(OrderProduct.OrderId));
     }
 }

@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OrderApi.Core.ExternalServices;
-using OrderApi.Infrastructure.ExternalServices;
 using SharedKernal;
 
-namespace OrderApi.Core;
+namespace OrderApi.Infrastructure.ExternalServices;
 
 public static class ExternalServicesLayer
 {

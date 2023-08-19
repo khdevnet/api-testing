@@ -12,7 +12,7 @@ using OrderApi.Infrastructure.Data;
 namespace OrderApi.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(OrdersContext))]
-    [Migration("20230819094327_Init")]
+    [Migration("20230819183238_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -42,7 +42,7 @@ namespace OrderApi.Infrastructure.Data.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("OrderApi.Core.Domain.Product", b =>
+            modelBuilder.Entity("OrderApi.Core.Domain.OrderProduct", b =>
                 {
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(450)");
@@ -50,14 +50,14 @@ namespace OrderApi.Infrastructure.Data.Migrations
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Name");
+                    b.HasKey("Name", "OrderId");
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("Product");
+                    b.ToTable("OrderProduct");
                 });
 
-            modelBuilder.Entity("OrderApi.Core.Domain.Product", b =>
+            modelBuilder.Entity("OrderApi.Core.Domain.OrderProduct", b =>
                 {
                     b.HasOne("OrderApi.Core.Domain.Order", "Order")
                         .WithMany("Products")

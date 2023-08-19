@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using OrderApi.Core;
 using OrderApi.Infrastructure.Data;
+using OrderApi.Infrastructure.ExternalServices;
 
 namespace OrderApi;
 
@@ -19,7 +21,10 @@ public class Startup
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddControllers();
+        services.AddControllers()
+            .AddJsonOptions(x =>
+            x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
+        ;
         services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "OrdersService", Version = "v1" }));
 
         services

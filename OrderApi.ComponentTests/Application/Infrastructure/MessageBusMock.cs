@@ -5,13 +5,13 @@ using SharedKernal;
 
 namespace OrderApi.ComponentTests.Application.Infrastructure;
 
-internal class MessageBusMock : IBus, IMessageSource
+public class MessageBusMock : IBus, IMessageSource
 {
     public event Action<object> OnMessage;
 
     public Task Publish<TMessage>(TMessage message)
     {
-        OnMessage(message);
+        OnMessage?.Invoke(message);
         return Task.CompletedTask;
     }
 }

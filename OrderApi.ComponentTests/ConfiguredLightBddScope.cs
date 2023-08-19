@@ -28,5 +28,6 @@ internal class ConfiguredLightBddScopeAttribute : LightBddScopeAttribute
         cfg.RegisterType<TestAppConfigurationsProvider>(InstanceScope.Single);
         cfg.RegisterType<MsSqlDbContainerMock>(InstanceScope.Single);
         cfg.RegisterType<AccountServiceMock>(InstanceScope.Single);
+        cfg.RegisterType<MessageBusMock>(InstanceScope.Single);
     }
 }
