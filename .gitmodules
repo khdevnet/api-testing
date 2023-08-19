@@ -1,0 +1,3 @@
+[submodule "wikigen"]
+	path = wikigen
+	url = https://vavacars@dev.azure.com/vavacars/VavaCars/_git/wikigen
