@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using OrderApi.Core.Domain;
 using OrderApi.Core.Repositories;
 
@@ -45,5 +46,8 @@ public class OrderRepository : IOrderRepository
         }
     }
 
-    public async Task<Order> GetByIdAsync(Guid orderId) => await _db.Orders.FindAsync(orderId);
+    public async Task<Order> GetByIdAsync(Guid orderId)
+        => await _db.Orders
+        .Include(x => x.Products)
+        .FirstOrDefaultAsync(x => x.Id == orderId);
 }

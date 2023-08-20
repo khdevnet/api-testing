@@ -1,28 +1,40 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using LightBDD.Framework.Parameters;
 using LightBDD.XUnit2;
 using OrderApi.ComponentTests.Features.Common;
 using OrderApi.Core.Domain;
+using OrderApi.Models;
 
 namespace Features;
 
 public class Managing_orders : Base_feature
 {
     [Scenario]
-    public async Task Creating_order() =>
+    public async Task Creating_order()
+    {
         await RunScenarioAsync<Managing_orders_steps>(
-            s => s.Given_a_valid_user_account(),
-            s => s.When_create_order_endpoint_is_called_for_products("product-A"),
+            s => s.Given_user_with_account_in_the_shop(),
+            s => s.User_send_create_new_order_with_products_request("product-A"),
             s => s.Then_response_should_have_status(HttpStatusCode.Created),
-            s => s.Then_response_should_contain_order(),
-            s => s.Then_OrderCreatedEvent_should_be_published(),
-            s => s.Then_get_order_endpoint_should_return_order_with_status(OrderStatus.Created));
+            s => s.User_send_get_order_request(),
+            s => s.Then_response_should_have_status(HttpStatusCode.OK),
+            s => s.Then_response_body_equal<GetOrderResponse>(
+                Tree.ExpectContaining(
+                    new
+                    {
+                        Products = new[] { "product-A" }
+                    }
+                )
+            ),
+            s => s.Then_OrderCreatedEvent_should_be_published());
+    }
 
     [Scenario]
     public async Task Creating_order_for_invalid_account() =>
         await RunScenarioAsync<Managing_orders_steps>(
             s => s.Given_an_invalid_user_account(),
-            s => s.When_create_order_endpoint_is_called_for_products("product-A"),
+            s => s.User_send_create_new_order_with_products_request("product-A"),
             s => s.Then_response_should_have_status(HttpStatusCode.BadRequest));
 
     [Scenario]

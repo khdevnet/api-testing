@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using OrderApi.Core.Domain;
@@ -58,6 +59,18 @@ public class OrdersController : ControllerBase
     public async Task<IActionResult> GetById(Guid orderId)
     {
         var order = await _repository.GetByIdAsync(orderId);
-        return order != null ? Ok(order) : NotFound();
+
+        if (order is null)
+        {
+            return NotFound();
+        }
+
+        var orderResponse = new GetOrderResponse
+        {
+            AccountId = order.AccountId,
+            Products = order.Products.Select(p => p.Name).ToArray()
+        };
+
+        return Ok(orderResponse);
     }
 }

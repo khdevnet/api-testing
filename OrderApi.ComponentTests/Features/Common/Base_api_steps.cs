@@ -5,6 +5,9 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
+using LightBDD.Framework.Expectations;
+using LightBDD.Framework.Formatting.Values;
+using LightBDD.Framework.Parameters;
 using RestEase;
 
 namespace Features.Common;
@@ -15,10 +18,16 @@ internal abstract class Base_api_steps
 
     protected HttpResponseMessage Response { get; set; } = null!;
 
+    public Task Then_response_should_have_status(Verifiable<HttpStatusCode> status)
+    {
+        status.SetActual(Response.StatusCode);
+        return Task.CompletedTask;
+    }
+
     public Task Then_response_is_bad_request()
     {
-        Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
+        var expactation = Expect.To.Equal(HttpStatusCode.BadRequest);
+        expactation.Verify(Response.StatusCode, ValueFormattingServices.Current);
         return Task.CompletedTask;
     }
 
@@ -29,9 +38,15 @@ internal abstract class Base_api_steps
         actualMessage.Should().Be(expectedMessage);
     }
 
+    public async Task Then_response_body_equal<TBody>(VerifiableTree expectedBody)
+    {
+        TBody actualBody = await GetResponseBody<TBody>();
+        expectedBody.SetActual(actualBody);
+    }
+
     public async Task Then_response_body_equal<TBody>(TBody expectedBody)
     {
-        var actualBody = await GetResponseBody<TBody>();
+        TBody actualBody = await GetResponseBody<TBody>();
         actualBody.Should().BeEquivalentTo(expectedBody);
     }
 
@@ -50,7 +65,8 @@ internal abstract class Base_api_steps
 
     public Task Then_response_is_ok()
     {
-        Response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var expactation = Expect.To.Equal(HttpStatusCode.OK);
+        expactation.Verify(Response.StatusCode, ValueFormattingServices.Current);
 
         return Task.CompletedTask;
     }
