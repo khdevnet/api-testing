@@ -121,9 +121,9 @@ internal class Managing_orders_steps : Base_api_steps, IDisposable
 
     public async Task Then_OrderCreatedEvent_should_be_published()
     {
-        var expectedOrderCreatedEvent = new OrderCreatedEvent { OrderId = _orderId };
-        expectedOrderCreatedEvent.Log();
-        await _messageBusListener.EnsureReceived<OrderCreatedEvent>(x => x == expectedOrderCreatedEvent);
+        var orderCreatedEvent = new OrderCreatedEvent { OrderId = _orderId };
+        orderCreatedEvent.Log();
+        await _messageBusListener.EnsureReceived<OrderCreatedEvent>(x => x == orderCreatedEvent);
     }
 
     public async Task User_send_get_order_request()
