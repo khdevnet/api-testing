@@ -1,7 +1,9 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using LightBDD.Framework.Parameters;
 using LightBDD.XUnit2;
+using OrderApi.ComponentTests.Application.Infrastructure.AccountService;
 using OrderApi.ComponentTests.Features.Common;
 using OrderApi.Core.Domain;
 using OrderApi.Models;
@@ -13,28 +15,30 @@ public class Managing_orders : Base_feature
     [Scenario]
     public async Task Creating_order()
     {
+        var orderId = Guid.NewGuid();
+
         await RunScenarioAsync<Managing_orders_steps>(
-            s => s.Given_user_with_account_in_the_shop(),
-            s => s.User_send_create_new_order_with_products_request("product-A"),
+            s => s.Given_not_exist_order_with_id_ORDERID(orderId),
+            s => s.Given_sms_service_mock(),
+            s => s.Given_registered_user_account(TestAccounts.JohnDoe),
+            s => s.When_user_send_create_new_order_request("product-A"),
             s => s.Then_response_should_have_status(HttpStatusCode.Created),
             s => s.User_send_get_order_request(),
             s => s.Then_response_should_have_status(HttpStatusCode.OK),
             s => s.Then_response_body_equal<GetOrderResponse>(
                 Tree.ExpectContaining(
-                    new
-                    {
-                        Products = new[] { "product-A" }
-                    }
+                    new { OrderId = orderId, TestAccounts.JohnDoe.AccountId, Products = new[] { "product-A" } }
                 )
             ),
-            s => s.Then_OrderCreatedEvent_should_be_published());
+            s => s.Then_OrderCreatedEvent_should_be_published(),
+            s => s.Then_order_created_sms_sent_successful(TestAccounts.JohnDoe.PhoneNumber));
     }
 
     [Scenario]
     public async Task Creating_order_for_invalid_account() =>
         await RunScenarioAsync<Managing_orders_steps>(
             s => s.Given_an_invalid_user_account(),
-            s => s.User_send_create_new_order_with_products_request("product-A"),
+            s => s.When_user_send_create_new_order_request("product-A"),
             s => s.Then_response_should_have_status(HttpStatusCode.BadRequest));
 
     [Scenario]

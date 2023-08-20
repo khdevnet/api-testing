@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using OrderApi.ComponentTests.Application.Infrastructure;
+using OrderApi.ComponentTests.Application.Infrastructure.AccountService;
 
 namespace OrderApi.ComponentTests.Application;
 

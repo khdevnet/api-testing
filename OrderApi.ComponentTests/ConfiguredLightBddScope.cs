@@ -4,6 +4,7 @@ using LightBDD.XUnit2;
 using OrderApi.ComponentTests;
 using OrderApi.ComponentTests.Application;
 using OrderApi.ComponentTests.Application.Infrastructure;
+using OrderApi.ComponentTests.Application.Infrastructure.AccountService;
 
 [assembly: ClassCollectionBehavior(AllowTestParallelization = true)]
 [assembly: ConfiguredLightBddScope]

@@ -14,6 +14,10 @@ using SharedKernal;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using Moq;
+using OrderApi.ComponentTests.Application.Infrastructure.AccountService;
+using OrderApi.Core;
+using OrderApi.Core.ExternalServices.SmsService;
 
 namespace OrderApi.ComponentTests.Application;
 
@@ -21,16 +25,18 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
     private const string EnvironmentName = "ComponentTests";
     private readonly TestAppConfigurations _testAppConfigurationsProvider;
+
     private readonly DelegatingHandler[] _requestHandlers = new DelegatingHandler[]
     {
-        new HttpRequestLogAsCommentDelegatingHandler(new LightBDDTestLogger<HttpRequestLogAsCommentDelegatingHandler>()),
-        new HttpRequestToCurlDelegatingHandler()
+        new HttpRequestLogAsCommentDelegatingHandler(new LightBDDTestLogger<HttpRequestLogAsCommentDelegatingHandler>()), new HttpRequestToCurlDelegatingHandler()
     };
 
     public IOrdersClient OrdersClient { get; private set; }
     public AccountServiceMock AccountClientMock { get; private set; }
     public MessageBusMock MessageBusMock { get; private set; }
+    public Mock<ISmsService> SmsServiceMock { get; set; } = new();
 
+    public Mock<IOrderIdGenerator> OrderIdGeneratorMock { get; set; } = new();
 
     public TestWebApplicationFactory(
         TestAppConfigurations testAppConfigurationsProvider,
@@ -43,9 +49,6 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         AccountClientMock = accountClientMock;
         OrdersClient = RestClient.For<IOrdersClient>(CreateClientWithLogger());
     }
-
-
-    // public Mock<IGuidProvider> GuidProviderMock { get; init; } = new Mock<IGuidProvider>();
 
     public HttpClient CreateClientWithLogger() => CreateDefaultClient(_requestHandlers);
 
@@ -79,6 +82,10 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
         builder.ConfigureTestServices(services =>
         {
+            services.RemoveAll<ISmsService>();
+            services.AddSingleton<ISmsService>(_ => SmsServiceMock.Object);
+            services.RemoveAll<IOrderIdGenerator>();
+            services.AddSingleton<IOrderIdGenerator>(_ => OrderIdGeneratorMock.Object);
             services.RemoveAll<IBus>();
             services.AddSingleton<IBus>(_ => MessageBusMock);
         });

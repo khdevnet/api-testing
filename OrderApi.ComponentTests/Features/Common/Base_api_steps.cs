@@ -24,13 +24,6 @@ internal abstract class Base_api_steps
         return Task.CompletedTask;
     }
 
-    public Task Then_response_is_bad_request()
-    {
-        var expactation = Expect.To.Equal(HttpStatusCode.BadRequest);
-        expactation.Verify(Response.StatusCode, ValueFormattingServices.Current);
-        return Task.CompletedTask;
-    }
-
     public async Task Then_response_message_equal(string expectedMessage)
     {
         var actualMessage = await Response.Content.ReadAsStringAsync();
