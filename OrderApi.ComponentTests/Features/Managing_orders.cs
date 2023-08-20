@@ -11,7 +11,7 @@ public class Managing_orders : Base_feature
     [Scenario]
     public async Task Creating_order() =>
         await RunScenarioAsync<Managing_orders_steps>(
-            s => s.Given_a_valid_account(),
+            s => s.Given_a_valid_user_account(),
             s => s.When_create_order_endpoint_is_called_for_products("product-A"),
             s => s.Then_response_should_have_status(HttpStatusCode.Created),
             s => s.Then_response_should_contain_order(),
@@ -21,7 +21,7 @@ public class Managing_orders : Base_feature
     [Scenario]
     public async Task Creating_order_for_invalid_account() =>
         await RunScenarioAsync<Managing_orders_steps>(
-            s => s.Given_an_invalid_account(),
+            s => s.Given_an_invalid_user_account(),
             s => s.When_create_order_endpoint_is_called_for_products("product-A"),
             s => s.Then_response_should_have_status(HttpStatusCode.BadRequest));
 

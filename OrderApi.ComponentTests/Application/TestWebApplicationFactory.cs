@@ -14,43 +14,42 @@ using SharedKernal;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using WireMock.Server;
 
 namespace OrderApi.ComponentTests.Application;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
     private const string EnvironmentName = "ComponentTests";
-    private readonly TestAppConfigurationsProvider _testAppConfigurationsProvider;
-    private readonly MessageBusMock _messageBusMock;
+    private readonly TestAppConfigurations _testAppConfigurationsProvider;
+    private readonly DelegatingHandler[] _requestHandlers = new DelegatingHandler[]
+    {
+        new HttpRequestLogAsCommentDelegatingHandler(new LightBDDTestLogger<HttpRequestLogAsCommentDelegatingHandler>()),
+        new HttpRequestToCurlDelegatingHandler()
+    };
 
     public IOrdersClient OrdersClient { get; private set; }
     public AccountServiceMock AccountClientMock { get; private set; }
+    public MessageBusMock MessageBusMock { get; private set; }
+
 
     public TestWebApplicationFactory(
-        TestAppConfigurationsProvider testAppConfigurationsProvider,
+        TestAppConfigurations testAppConfigurationsProvider,
         AccountServiceMock accountClientMock,
         MessageBusMock messageBusMock
     )
     {
-        WireMockServer = WireMockServer.Start();
         _testAppConfigurationsProvider = testAppConfigurationsProvider;
-        _messageBusMock = messageBusMock;
+        MessageBusMock = messageBusMock;
         AccountClientMock = accountClientMock;
         OrdersClient = RestClient.For<IOrdersClient>(CreateClientWithLogger());
     }
 
-    public WireMockServer WireMockServer { get; init; }
 
     // public Mock<IGuidProvider> GuidProviderMock { get; init; } = new Mock<IGuidProvider>();
 
-    public HttpClient CreateClientWithLogger() => CreateDefaultClient(new StepHttpLoggingHandler(new LightBDDTestLogger<StepHttpLoggingHandler>()));
+    public HttpClient CreateClientWithLogger() => CreateDefaultClient(_requestHandlers);
 
-    protected override void Dispose(bool disposing)
-    {
-        WireMockServer.Dispose();
-        base.Dispose(disposing);
-    }
+    protected override void Dispose(bool disposing) => base.Dispose(disposing);
 
     protected override TestServer CreateServer(IWebHostBuilder builder)
     {
@@ -81,7 +80,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         builder.ConfigureTestServices(services =>
         {
             services.RemoveAll<IBus>();
-            services.AddScoped<IBus>(_ => _messageBusMock);
+            services.AddSingleton<IBus>(_ => MessageBusMock);
         });
     }
 

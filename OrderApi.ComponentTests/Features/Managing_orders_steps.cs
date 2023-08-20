@@ -32,22 +32,21 @@ internal class Managing_orders_steps : IDisposable
 
     // Uses DI container to resolve these dependencies
     public Managing_orders_steps(
-        TestWebApplicationFactory app,
-        MessageBusMock messageBusMock)
+        TestWebApplicationFactory app)
     {
         _client = app.OrdersClient;
         _accountService = app.AccountClientMock;
-        _listener = MessageListener.Start(messageBusMock);
+        _listener = MessageListener.Start(app.MessageBusMock);
         App = app;
     }
 
-    public Task Given_a_valid_account()
+    public Task Given_a_valid_user_account()
     {
         _accountService.SetupGetAccount(_accountId, true);
         return Task.CompletedTask;
     }
 
-    public Task Given_an_invalid_account()
+    public Task Given_an_invalid_user_account()
     {
         _accountService.SetupGetAccount(_accountId, false);
         return Task.CompletedTask;
@@ -84,7 +83,7 @@ internal class Managing_orders_steps : IDisposable
     public Task<CompositeStep> Given_a_created_order() =>
         Task.FromResult(CompositeStep.DefineNew()
             .AddAsyncSteps(
-                _ => Given_a_valid_account(),
+                _ => Given_a_valid_user_account(),
                 _ => When_create_order_endpoint_is_called_for_products("OrderProduct-A", "OrderProduct-B", "OrderProduct-C"),
                 _ => Then_response_should_have_status(HttpStatusCode.Created),
                 _ => Then_response_should_contain_order())

@@ -10,18 +10,18 @@ using Newtonsoft.Json;
 
 namespace OrderApi.ComponentTests.LightBDD;
 
-public class StepHttpLoggingHandler : DelegatingHandler
+public class HttpRequestLogAsCommentDelegatingHandler : DelegatingHandler
 {
-    private readonly ILogger<StepHttpLoggingHandler> _logger;
+    private readonly ILogger<HttpRequestLogAsCommentDelegatingHandler> _logger;
 
-    public StepHttpLoggingHandler(ILogger<StepHttpLoggingHandler> logger)
+    public HttpRequestLogAsCommentDelegatingHandler(ILogger<HttpRequestLogAsCommentDelegatingHandler> logger)
         => _logger = logger;
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         var requestShortPath = $"{request.Method} {request.RequestUri?.AbsolutePath}";
 
-        await LogRequestAsync($"{requestShortPath}", request);
+        await LogRequestAsync($"Request: {requestShortPath}", request);
 
         var response = await base.SendAsync(request, cancellationToken);
 
@@ -53,7 +53,7 @@ public class StepHttpLoggingHandler : DelegatingHandler
     }
 
     private void LogInformation(string message, Dictionary<string, string> properties)
-        => _logger.LogInformation($"{message}: {Environment.NewLine} {JsonConvert.SerializeObject(properties, Formatting.Indented)}");
+        => _logger.LogInformation($"{message} {Environment.NewLine} {JsonConvert.SerializeObject(properties, Formatting.Indented)}");
 
     private async Task LogResponseAsync(string message, HttpResponseMessage response)
     {

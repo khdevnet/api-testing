@@ -25,9 +25,8 @@ internal class ConfiguredLightBddScopeAttribute : LightBddScopeAttribute
     private void ConfigureDI(IDefaultContainerConfigurator cfg)
     {
         cfg.RegisterType<TestWebApplicationFactory>(InstanceScope.Single);
-        cfg.RegisterType<TestAppConfigurationsProvider>(InstanceScope.Single);
+        cfg.RegisterType<TestAppConfigurations>(InstanceScope.Single);
         cfg.RegisterType<MsSqlDbContainerMock>(InstanceScope.Single);
         cfg.RegisterType<AccountServiceMock>(InstanceScope.Single);
-        cfg.RegisterType<MessageBusMock>(InstanceScope.Single);
     }
 }

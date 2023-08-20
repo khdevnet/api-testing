@@ -3,21 +3,21 @@ using OrderApi.ComponentTests.Application.Infrastructure;
 
 namespace OrderApi.ComponentTests.Application;
 
-public class TestAppConfigurationsProvider
+public class TestAppConfigurations
 {
-    private readonly MsSqlDbContainerMock _dbContainerFixture;
+    private readonly MsSqlDbContainerMock _dbContainerFixtureMock;
     private readonly AccountServiceMock _accountServiceMock;
 
-    public TestAppConfigurationsProvider(MsSqlDbContainerMock dbContainerFixture, AccountServiceMock accountServiceMock)
+    public TestAppConfigurations(MsSqlDbContainerMock dbContainerFixtureMock, AccountServiceMock accountServiceMock)
     {
-        _dbContainerFixture = dbContainerFixture;
+        _dbContainerFixtureMock = dbContainerFixtureMock;
         _accountServiceMock = accountServiceMock;
     }
 
     public IDictionary<string, string> Get()
         => new Dictionary<string, string>()
         {
-            { "ConnectionStrings:OrdersContext", _dbContainerFixture.DbConnectionString },
+            { "ConnectionStrings:OrdersContext", _dbContainerFixtureMock.DbConnectionString },
             { "Clients:AccountService", _accountServiceMock.GetUrl() }
         };
 }
