@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using LightBDD.Framework;
@@ -11,16 +10,14 @@ using OrderApi.ComponentTests.Application.Clients;
 using OrderApi.ComponentTests.Application;
 using OrderApi.Core.Domain;
 using OrderApi.Models;
-using Xunit;
-using OrderApi.ComponentTests.Application.Infrastructure;
 using OrderApi.Core.Messages;
 using SharedKernal;
 using OrderApi.Messages;
 using OrderApi.ComponentTests.LightBDD;
 using Features.Common;
+using FluentAssertions;
 using Moq;
 using OrderApi.ComponentTests.Application.Infrastructure.AccountService;
-using OrderApi.Core.ExternalServices.SmsService;
 
 namespace Features;
 
@@ -31,8 +28,6 @@ internal class Managing_orders_steps : Base_api_steps, IDisposable
     private readonly IOrdersClient _client;
     private State<Guid> _accountId;
     private State<Guid> _orderId;
-
-    private Order _order;
 
     public TestWebApplicationFactory App { get; }
 
@@ -54,27 +49,18 @@ internal class Managing_orders_steps : Base_api_steps, IDisposable
         return Task.CompletedTask;
     }
 
-    public Task Given_user_with_account_in_the_shop()
-    {
-        _accountId.Log();
-        _accountServiceMock.SetupAccountValidateRequest(_accountId, true);
-
-        return Task.CompletedTask;
-    }
-
-    public Task Given_sms_service_mock()
-    {
-        App.SmsServiceMock
-            .Setup(m => m.SendOrderCreatedSms(It.IsAny<string>()))
-            .Returns(Task.CompletedTask);
-
-        return Task.CompletedTask;
-    }
-
-    public Task Then_order_created_sms_sent_successful(string phoneNumber)
+    public Task Then_order_created_sms_sent(string phoneNumber)
     {
         App.SmsServiceMock
             .Verify(m => m.SendOrderCreatedSms(It.Is<string>(arg => arg == phoneNumber)));
+
+        return Task.CompletedTask;
+    }
+
+    public Task Then_order_created_sms_not_sent(string phoneNumber)
+    {
+        App.SmsServiceMock
+            .Verify(m => m.SendOrderCreatedSms(It.Is<string>(arg => arg == phoneNumber)), Times.Never);
 
         return Task.CompletedTask;
     }
@@ -89,34 +75,10 @@ internal class Managing_orders_steps : Base_api_steps, IDisposable
         return Task.CompletedTask;
     }
 
-    public Task Given_an_invalid_user_account()
-    {
-        _accountId.Log();
-        _accountServiceMock.SetupAccountValidateRequest(_accountId, false);
-
-        return Task.CompletedTask;
-    }
-
     public async Task When_user_send_create_new_order_request(params string[] products)
     {
         var request = new CreateOrderRequest { AccountId = _accountId, Products = products };
         Response = await _client.CreateOrder(request);
-    }
-
-    public async Task Then_response_should_contain_order(VerifiableTree verifiableOrder)
-    {
-        var or = await Response.Content.ReadFromJsonAsync<GetOrderResponse>();
-        verifiableOrder.SetActual(_order);
-        //_order.Should()
-        //    .BeEquivalentTo(
-        //        VerifiableOrder.GetActual(),
-        //        options => options.Excluding(o => o.Id));
-    }
-
-    public async Task Then_response_should_contain_order()
-    {
-        _order = await Response.Content.ReadFromJsonAsync<Order>();
-        Assert.NotEqual(Guid.Empty, _order?.Id);
     }
 
     public async Task Then_OrderCreatedEvent_should_be_published()
@@ -126,39 +88,42 @@ internal class Managing_orders_steps : Base_api_steps, IDisposable
         await _messageBusListener.EnsureReceived<OrderCreatedEvent>(x => x == orderCreatedEvent);
     }
 
-    public async Task User_send_get_order_request()
+    public Task Then_OrderCreatedEvent_should_not_be_published()
+    {
+        var events = _messageBusListener
+            .GetMessages<OrderCreatedEvent>();
+
+        events.Should().BeEmpty();
+
+        return Task.CompletedTask;
+    }
+
+    public async Task When_user_get_order_details_by_send_get_order_request()
         => Response = await _client.Get(_orderId);
 
-    public async Task Then_get_order_endpoint_should_return_order_with_status(Verifiable<OrderStatus> status)
-    {
-        var orderResponse = await _client.Get(_order.Id);
-        var order = await orderResponse.Content.ReadFromJsonAsync<Order>();
-        status.SetActual(order!.Status);
-    }
+    public async Task<CompositeStep> Given_a_created_order_precondition(Guid orderId)
+        => await Given_a_created_order_scenario(orderId);
 
-    public Task<CompositeStep> Given_a_created_order() =>
+    public Task<CompositeStep> Given_a_created_order_scenario(Guid orderId) =>
         Task.FromResult(CompositeStep.DefineNew()
             .AddAsyncSteps(
-                _ => Given_user_with_account_in_the_shop(),
+                _ => Given_not_exist_order_with_id_ORDERID(orderId),
+                _ => Given_registered_user_account(TestAccounts.JohnDoe),
                 _ => When_user_send_create_new_order_request("OrderProduct-A", "OrderProduct-B", "OrderProduct-C"),
-                _ => Then_response_should_have_status(HttpStatusCode.Created),
-                _ => Then_response_should_contain_order())
+                _ => Then_response_should_have_status(HttpStatusCode.Created))
             .Build());
 
-    public async Task When_RejectOrderCommand_is_sent_for_this_order()
+    public async Task When_RejectOrderCommand_is_received_for_this_order()
     {
         var handler = App.RetrieveScopedService<IHandleMessages<RejectOrderCommand>>();
-        await handler.Handle(new RejectOrderCommand { OrderId = _order.Id });
+        await handler.Handle(new RejectOrderCommand { OrderId = _orderId });
     }
 
-    public async Task When_ApproveOrderCommand_is_sent_for_this_order()
+    public async Task When_ApproveOrderCommand_received()
     {
         var handler = App.RetrieveScopedService<IHandleMessages<ApproveOrderCommand>>();
-        await handler.Handle(new ApproveOrderCommand { OrderId = _order.Id });
+        await handler.Handle(new ApproveOrderCommand { OrderId = _orderId });
     }
-
-    public async Task Then_OrderStatusUpdatedEvent_should_be_published_with_status(OrderStatus status)
-        => await _messageBusListener.EnsureReceived<OrderStatusUpdatedEvent>(x => x.OrderId == _order.Id && x.Status == status);
 
     public void Dispose()
         => _messageBusListener?.Dispose();

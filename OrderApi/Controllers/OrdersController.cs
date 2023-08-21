@@ -3,8 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using OrderApi.Core.Domain;
-using OrderApi.Core.Domain.UseCases;
 using OrderApi.Core.Repositories;
+using OrderApi.Core.Services;
 using OrderApi.Models;
 
 namespace OrderApi.Controllers;
@@ -17,14 +17,14 @@ namespace OrderApi.Controllers;
 public class OrdersController : ControllerBase
 {
     private readonly IOrderRepository _repository;
-    private readonly CreateOrderUseCase _createOrderUseCase;
+    private readonly CreateOrderService _createOrderService;
 
     public OrdersController(
         IOrderRepository repository,
-        CreateOrderUseCase createOrderUseCase)
+        CreateOrderService createOrderService)
     {
         _repository = repository;
-        _createOrderUseCase = createOrderUseCase;
+        _createOrderService = createOrderService;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class OrdersController : ControllerBase
     {
         try
         {
-            Order order = await _createOrderUseCase.CreateOrder(new CreateOrder(request.AccountId, request.Products));
+            Order order = await _createOrderService.CreateOrder(new CreateOrder(request.AccountId, request.Products));
 
             return CreatedAtAction(nameof(GetById), new { orderId = order.Id }, order);
         }
@@ -58,7 +58,7 @@ public class OrdersController : ControllerBase
             return NotFound();
         }
 
-        var orderResponse = new GetOrderResponse { AccountId = order.AccountId, OrderId = order.Id, Products = order.Products.Select(p => p.Name).ToArray() };
+        var orderResponse = new GetOrderResponse { AccountId = order.AccountId, Status = order.Status, OrderId = order.Id, Products = order.Products.Select(p => p.Name).ToArray() };
 
         return Ok(orderResponse);
     }

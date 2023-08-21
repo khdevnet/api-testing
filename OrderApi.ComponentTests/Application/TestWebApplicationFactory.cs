@@ -14,6 +14,7 @@ using SharedKernal;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Moq;
 using OrderApi.ComponentTests.Application.Infrastructure.AccountService;
 using OrderApi.Core;
@@ -26,7 +27,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
     private const string EnvironmentName = "ComponentTests";
     private readonly TestAppConfigurations _testAppConfigurationsProvider;
 
-    private readonly DelegatingHandler[] _requestHandlers = new DelegatingHandler[]
+    private readonly DelegatingHandler[] _requestHandlers =
     {
         new HttpRequestLogAsCommentDelegatingHandler(new LightBDDTestLogger<HttpRequestLogAsCommentDelegatingHandler>()), new HttpRequestToCurlDelegatingHandler()
     };
@@ -48,6 +49,10 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         MessageBusMock = messageBusMock;
         AccountClientMock = accountClientMock;
         OrdersClient = RestClient.For<IOrdersClient>(CreateClientWithLogger());
+
+        SmsServiceMock
+            .Setup(m => m.SendOrderCreatedSms(It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
     }
 
     public HttpClient CreateClientWithLogger() => CreateDefaultClient(_requestHandlers);

@@ -1,12 +1,13 @@
-﻿using OrderApi.Core.ExternalServices.AccountService;
+﻿using OrderApi.Core.Domain;
+using OrderApi.Core.ExternalServices.AccountService;
 using OrderApi.Core.ExternalServices.SmsService;
 using OrderApi.Core.Messages;
 using OrderApi.Core.Repositories;
 using SharedKernal;
 
-namespace OrderApi.Core.Domain.UseCases;
+namespace OrderApi.Core.Services;
 
-public class CreateOrderUseCase
+public class CreateOrderService
 {
     private readonly IAccountServiceClient _accountServiceClient;
     private readonly ISmsService _smsService;
@@ -14,7 +15,7 @@ public class CreateOrderUseCase
     private readonly IOrderRepository _repository;
     private readonly IOrderIdGenerator _orderIdGenerator;
 
-    public CreateOrderUseCase(
+    public CreateOrderService(
         IAccountServiceClient accountServiceClient,
         ISmsService smsService,
         IBus bus,

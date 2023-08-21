@@ -21,24 +21,26 @@ public class OrderStatusHandler : IHandleMessages<ApproveOrderCommand>, IHandleM
     /// Updates order status to Complete and publish OrderProductDispatchEvent for each ordered product
     /// </summary>
     public async Task Handle(ApproveOrderCommand message)
-        => await UpdateOrderStatus(message.OrderId, OrderStatus.Complete);
-
+    {
+        var order = await GetOrderById(message.OrderId);
+        order.Completed();
+        await _repository.UpdateAsync(order);
+    }
 
     /// <summary>
     /// Updates order status to rejected
     /// </summary>
     public async Task Handle(RejectOrderCommand message)
-        => await UpdateOrderStatus(message.OrderId, OrderStatus.Rejected);
-
-    private async Task UpdateOrderStatus(Guid orderId, OrderStatus status)
     {
-        var order = await _repository.GetByIdAsync(orderId);
-        if (order is not { Status: OrderStatus.Created })
-        {
-            throw new ApplicationException("Order not exist.");
-        }
+        var order = await GetOrderById(message.OrderId);
+        order.Rejected();
+        await _repository.UpdateAsync(order);
+    }
 
-        order = order with { Status = status };
-        await _repository.AddAsync(order);
+    private async Task<Order> GetOrderById(Guid orderId)
+    {
+        Order order = await _repository.GetByIdAsync(orderId);
+
+        return order;
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace OrderApi.Core.Domain.UseCases;
+﻿namespace OrderApi.Core.Services;
 
 public record CreateOrder
 {

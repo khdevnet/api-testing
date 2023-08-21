@@ -1,4 +1,5 @@
-﻿using LightBDD.Core.Configuration;
+﻿using Features;
+using LightBDD.Core.Configuration;
 using LightBDD.Core.Dependencies;
 using LightBDD.XUnit2;
 using OrderApi.ComponentTests;
@@ -25,6 +26,7 @@ internal class ConfiguredLightBddScopeAttribute : LightBddScopeAttribute
 
     private void ConfigureDI(IDefaultContainerConfigurator cfg)
     {
+        cfg.RegisterType<Managing_orders_steps>(InstanceScope.Scenario);
         cfg.RegisterType<TestWebApplicationFactory>(InstanceScope.Single);
         cfg.RegisterType<TestAppConfigurations>(InstanceScope.Single);
         cfg.RegisterType<MsSqlDbContainerMock>(InstanceScope.Single);

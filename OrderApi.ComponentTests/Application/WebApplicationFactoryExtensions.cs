@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using SharedKernal;
 
 namespace OrderApi.ComponentTests.Application;
 
@@ -17,7 +19,8 @@ public static class WebApplicationFactoryExtensions
         if (serviceScopeFactory is null)
             throw new Exception($"Failed to retrieve {nameof(IServiceScopeFactory)} from provided WebApplicationFactory.");
 
-        using var serviceScope = serviceScopeFactory.CreateScope();
+        var serviceScope = serviceScopeFactory.CreateScope();
+
         return serviceScope.ServiceProvider.GetRequiredService<TMessageHandler>();
     }
 }
