@@ -7,7 +7,7 @@ namespace OrderApi.Infrastructure.Data;
 public class ApplyMigrationsPostStartup : IHostedService
 {
     private readonly IServiceProvider _provider;
-
+    private static readonly SemaphoreSlim _lock = new(1, 1);
     public ApplyMigrationsPostStartup(IServiceProvider provider) => _provider = provider;
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -19,8 +19,9 @@ public class ApplyMigrationsPostStartup : IHostedService
             .GetRequiredService<OrdersContext>();
 
         // Here is the migration executed
-        await dbContext.Database.EnsureCreatedAsync(cancellationToken);
+        await _lock.WaitAsync(cancellationToken);
         await dbContext.Database.MigrateAsync(cancellationToken);
+        _lock.Release();
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

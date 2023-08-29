@@ -10,11 +10,12 @@ public static class DataLayer
 {
     public static IServiceCollection RegisterDataLayer(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
-
         serviceCollection.AddScoped<IOrderRepository, OrderRepository>();
         serviceCollection.AddDbContext<OrdersContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("OrdersContext")));
-
+            options.UseSqlServer(
+                configuration.GetConnectionString("OrdersContext"),
+                b => b.MigrationsAssembly("OrderApi.Infrastructure.Data")));
+        //,        b => b.MigrationsAssembly("OrderApi.Infrastructure.Data")
         serviceCollection.AddHostedService<ApplyMigrationsPostStartup>();
         return serviceCollection;
     }

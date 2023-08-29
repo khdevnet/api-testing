@@ -1,6 +1,6 @@
 ﻿using OrderApi.Core.ExternalServices.SmsService;
 
-namespace OrderApi.Infrastructure.ExternalServices.SmsService;
+namespace OrderApi.Infrastructure.ExternalServices.Sms;
 
 public class SmsService : ISmsService
 {

@@ -1,7 +1,6 @@
-﻿using OrderApi.Core.ExternalServices.SmsService;
-using RestEase;
+﻿using RestEase;
 
-namespace OrderApi.Infrastructure.ExternalServices.SmsService;
+namespace OrderApi.Infrastructure.ExternalServices.Sms;
 
 [BasePath("providers/sms")]
 public interface ISmsProvider
