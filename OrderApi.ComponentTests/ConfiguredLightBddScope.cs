@@ -1,7 +1,9 @@
 ﻿using Features;
 using LightBDD.Core.Configuration;
 using LightBDD.Core.Dependencies;
+using LightBDD.Extensions.DependencyInjection;
 using LightBDD.XUnit2;
+using Microsoft.Extensions.DependencyInjection;
 using OrderApi.ComponentTests;
 using OrderApi.ComponentTests.Application;
 using OrderApi.ComponentTests.Application.Infrastructure;
@@ -20,16 +22,16 @@ internal class ConfiguredLightBddScopeAttribute : LightBddScopeAttribute
             .UseDefault(ConfigureDI);
 
         configuration.ExecutionExtensionsConfiguration()
-            .RegisterGlobalSetUp<MsSqlDbContainerMock>()
-            .RegisterGlobalSetUp<AccountServiceMock>();
+            .RegisterGlobalSetUp<MsSqlDbContainerMock>();
     }
 
     private void ConfigureDI(IDefaultContainerConfigurator cfg)
     {
-        cfg.RegisterType<Managing_orders_steps>(InstanceScope.Scenario);
-        cfg.RegisterType<TestWebApplicationFactory>(InstanceScope.Single);
-        cfg.RegisterType<TestAppConfigurations>(InstanceScope.Single);
         cfg.RegisterType<MsSqlDbContainerMock>(InstanceScope.Single);
-        cfg.RegisterType<AccountServiceMock>(InstanceScope.Single);
+        cfg.RegisterType<Managing_orders_steps>(InstanceScope.Scenario);
+        cfg.RegisterType<TestWebApplicationFactory>(InstanceScope.Scenario);
+        cfg.RegisterType<TestAppConfigurations>(InstanceScope.Scenario);
+        cfg.RegisterType<AccountServiceMock>(InstanceScope.Scenario);
+        cfg.RegisterType<MessageBusMock>(InstanceScope.Scenario);
     }
 }

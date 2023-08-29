@@ -6,9 +6,9 @@ using LightBDD.XUnit2;
 
 namespace OrderApi.ComponentTests.Features.Common;
 
-public class Base_feature : FeatureFixture
+public abstract class Base_feature : FeatureFixture
 {
-    protected Task RunScenarioAsync<TSteps>(params Expression<Func<TSteps, Task>>[] steps)
-       => Runner.WithContext<TSteps>()
-                .RunScenarioAsync(steps);
+    protected async Task RunScenarioAsync<TSteps>(params Expression<Func<TSteps, Task>>[] steps)
+        => await Runner.WithContext<TSteps>()
+               .RunScenarioAsync(steps);
 }

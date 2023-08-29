@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Net;
-using System.Threading.Tasks;
-using LightBDD.Core.Execution;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Server;
 
+#pragma warning disable CS1998
+
 namespace OrderApi.ComponentTests.Application.Infrastructure.AccountService;
 
-public class AccountServiceMock : IGlobalResourceSetUp
+public class AccountServiceMock : IDisposable
 {
-    private WireMockServer _server;
+    private readonly WireMockServer _server;
+
+    public AccountServiceMock()
+        => _server = WireMockServer.Start();
 
     public void SetupAccountValidateRequest(Guid accountId, bool response) =>
         _server.Given(Request.Create().UsingGet().WithPath($"/accounts/{accountId}/validate"))
@@ -22,17 +25,5 @@ public class AccountServiceMock : IGlobalResourceSetUp
 
     public string GetUrl() => _server.Url;
 
-    public Task SetUpAsync()
-    {
-        _server = WireMockServer.Start();
-
-        return Task.CompletedTask;
-    }
-
-    public Task TearDownAsync()
-    {
-        _server?.Dispose();
-
-        return Task.CompletedTask;
-    }
+    public void Dispose() => _server?.Dispose();
 }

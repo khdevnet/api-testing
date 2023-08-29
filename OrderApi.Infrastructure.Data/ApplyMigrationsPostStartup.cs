@@ -19,6 +19,7 @@ public class ApplyMigrationsPostStartup : IHostedService
             .GetRequiredService<OrdersContext>();
 
         // Here is the migration executed
+        await dbContext.Database.EnsureCreatedAsync(cancellationToken);
         await dbContext.Database.MigrateAsync(cancellationToken);
     }
 

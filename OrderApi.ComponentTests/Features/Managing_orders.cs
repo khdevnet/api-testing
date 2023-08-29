@@ -81,4 +81,9 @@ public class Managing_orders : Base_feature
                 )
             ));
     }
+    //
+    // protected override Managing_orders_steps CreateFeatureContext<Managing_orders_steps>(IDependencyResolver resolver)
+    // {
+    //     return new Managing_orders_steps();
+    // }
 }
