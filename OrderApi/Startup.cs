@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.FeatureManagement;
 using Microsoft.OpenApi.Models;
 using OrderApi.Core;
 using OrderApi.Infrastructure.Data;
@@ -23,9 +24,10 @@ public class Startup
     {
         services.AddControllers()
             .AddJsonOptions(x =>
-            x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
-        ;
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
+
         services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "OrdersService", Version = "v1" }));
+        services.AddFeatureManagement(Configuration.GetSection("Features"));
 
         services
             .RegisterApiLayer()

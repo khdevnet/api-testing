@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +10,6 @@ using OrderApi.ComponentTests.Application.Infrastructure;
 using OrderApi.ComponentTests.LightBDD;
 using RestEase;
 using Serilog;
-using Serilog.Events;
 using SharedKernal;
 using System.IO;
 using System.Linq;
@@ -19,6 +19,8 @@ using Moq;
 using OrderApi.ComponentTests.Application.Infrastructure.AccountService;
 using OrderApi.Core;
 using OrderApi.Core.ExternalServices.SmsService;
+using OrderApi.Infrastructure.ExternalServices.Notifications.Sms;
+using OrderApi.Infrastructure.ExternalServices.Notifications.Whatsup;
 
 namespace OrderApi.ComponentTests.Application;
 
@@ -32,12 +34,12 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         new HttpRequestLogAsCommentDelegatingHandler(new LightBDDTestLogger<HttpRequestLogAsCommentDelegatingHandler>()), new HttpRequestToCurlDelegatingHandler()
     };
 
-    public IOrdersClient OrdersClient { get; private set; }
-    public AccountServiceMock AccountClientMock { get; private set; }
-    public MessageBusMock MessageBusMock { get; private set; }
-    public Mock<ISmsService> SmsServiceMock { get; set; } = new();
-
-    public Mock<IOrderIdGenerator> OrderIdGeneratorMock { get; set; } = new();
+    public IOrdersClient OrdersClient { get; }
+    public AccountServiceMock AccountClientMock { get; }
+    public MessageBusMock MessageBusMock { get; }
+    public Mock<ISmsProvider> SmsProviderMock { get; } = new();
+    public Mock<IWhatsupProvider> WhatsupProviderMock { get; } = new();
+    public Mock<IOrderIdGenerator> OrderIdGeneratorMock { get; } = new();
 
     public TestWebApplicationFactory(
         TestAppConfigurations testAppConfigurationsProvider,
@@ -50,27 +52,33 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         AccountClientMock = accountClientMock;
         OrdersClient = RestClient.For<IOrdersClient>(CreateClientWithLogger());
 
-        SmsServiceMock
-            .Setup(m => m.SendOrderCreatedSms(It.IsAny<string>()))
+        SmsProviderMock
+            .Setup(m => m.Send(It.IsAny<SendSmsRequest>()))
+            .Returns(Task.FromResult(new SendSmsResponse(true)));
+
+        WhatsupProviderMock
+            .Setup(m => m.Send(It.IsAny<MessageRequest>()))
             .Returns(Task.CompletedTask);
     }
 
-    public HttpClient CreateClientWithLogger() => CreateDefaultClient(_requestHandlers);
-
-    protected override void Dispose(bool disposing) => base.Dispose(disposing);
-
-    protected override TestServer CreateServer(IWebHostBuilder builder)
+    public HttpClient CreateClientWithLogger()
     {
-        var server = base.CreateServer(builder);
+        try
+        {
+            return CreateDefaultClient(_requestHandlers);
+        }
+        catch (Exception e)
+        {
+            Log.Logger.Error(e, nameof(CreateClientWithLogger));
 
-        return server;
+            throw;
+        }
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         base.ConfigureWebHost(builder);
-
-        SetLogger(builder);
+        builder.UseSerilog();
 
         builder.UseEnvironment(EnvironmentName);
         builder.UseContentRoot(Directory.GetCurrentDirectory());
@@ -87,22 +95,14 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
         builder.ConfigureTestServices(services =>
         {
-            services.RemoveAll<ISmsService>();
-            services.AddSingleton<ISmsService>(_ => SmsServiceMock.Object);
+            services.RemoveAll<ISmsProvider>();
+            services.AddSingleton<ISmsProvider>(_ => SmsProviderMock.Object);
+            services.RemoveAll<IWhatsupProvider>();
+            services.AddSingleton<IWhatsupProvider>(_ => WhatsupProviderMock.Object);
             services.RemoveAll<IOrderIdGenerator>();
             services.AddSingleton<IOrderIdGenerator>(_ => OrderIdGeneratorMock.Object);
             services.RemoveAll<IBus>();
             services.AddSingleton<IBus>(_ => MessageBusMock);
         });
     }
-
-    private static void SetLogger(IWebHostBuilder builder) =>
-        builder.UseSerilog((_, loggerConfiguration) =>
-        {
-            loggerConfiguration.MinimumLevel.Is(LogEventLevel.Verbose);
-            loggerConfiguration.Enrich.FromLogContext();
-
-            loggerConfiguration.WriteTo.File(Path.Combine(Directory.GetCurrentDirectory(), "OrdersApiTestLogs.txt"), rollingInterval: RollingInterval.Day,
-                outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Properties:j}{NewLine}{Exception}{NewLine}");
-        });
 }

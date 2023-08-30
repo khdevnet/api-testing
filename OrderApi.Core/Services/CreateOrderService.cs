@@ -10,20 +10,20 @@ namespace OrderApi.Core.Services;
 public class CreateOrderService
 {
     private readonly IAccountServiceClient _accountServiceClient;
-    private readonly ISmsService _smsService;
+    private readonly IOrderProgressNotifier _orderProgressNotifier;
     private readonly IBus _bus;
     private readonly IOrderRepository _repository;
     private readonly IOrderIdGenerator _orderIdGenerator;
 
     public CreateOrderService(
         IAccountServiceClient accountServiceClient,
-        ISmsService smsService,
+        IOrderProgressNotifier orderProgressNotifier,
         IBus bus,
         IOrderRepository repository,
         IOrderIdGenerator orderIdGenerator)
     {
         _accountServiceClient = accountServiceClient;
-        _smsService = smsService;
+        _orderProgressNotifier = orderProgressNotifier;
         _bus = bus;
         _repository = repository;
         _orderIdGenerator = orderIdGenerator;
@@ -47,7 +47,7 @@ public class CreateOrderService
 
         // Outbox pattern should use there
         await _bus.Publish(new OrderCreatedEvent { OrderId = order.Id });
-        await _smsService.SendOrderCreatedSms(userAccount.PhoneNumber);
+        await _orderProgressNotifier.SendOrderCreated(userAccount.PhoneNumber);
 
         return order;
     }

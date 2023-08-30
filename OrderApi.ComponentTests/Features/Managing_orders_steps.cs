@@ -18,6 +18,8 @@ using Features.Common;
 using FluentAssertions;
 using Moq;
 using OrderApi.ComponentTests.Application.Infrastructure.AccountService;
+using OrderApi.Infrastructure.ExternalServices.Notifications.Sms;
+using OrderApi.Infrastructure.ExternalServices.Notifications.Whatsup;
 
 namespace Features;
 
@@ -51,16 +53,24 @@ internal class Managing_orders_steps : Base_api_steps, IDisposable
 
     public Task Then_order_created_sms_sent(string phoneNumber)
     {
-        App.SmsServiceMock
-            .Verify(m => m.SendOrderCreatedSms(It.Is<string>(arg => arg == phoneNumber)));
+        App.SmsProviderMock
+            .Verify(m => m.Send(It.Is<SendSmsRequest>(arg => arg.phone == phoneNumber)));
+
+        return Task.CompletedTask;
+    }
+
+    public Task Then_order_created_whatsup_message_sent(string phoneNumber)
+    {
+        App.WhatsupProviderMock
+            .Verify(m => m.Send(It.Is<MessageRequest>(arg => arg.PhoneNumber == phoneNumber)));
 
         return Task.CompletedTask;
     }
 
     public Task Then_order_created_sms_not_sent(string phoneNumber)
     {
-        App.SmsServiceMock
-            .Verify(m => m.SendOrderCreatedSms(It.Is<string>(arg => arg == phoneNumber)), Times.Never);
+        App.SmsProviderMock
+            .Verify(m => m.Send(It.Is<SendSmsRequest>(arg => arg.phone == phoneNumber)), Times.Never);
 
         return Task.CompletedTask;
     }
