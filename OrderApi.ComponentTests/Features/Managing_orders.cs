@@ -42,11 +42,14 @@ public class Managing_orders : Base_feature
     {
         var orderId = Guid.NewGuid();
 
-        await Runner.WithContext(r => new Managing_orders_steps(
-                new TestWebApplicationFactory(
-                    r.Resolve<FeatureTestAppConfigurations>(),
-                    r.Resolve<AccountServiceMock>(),
-                    r.Resolve<MessageBusMock>())))
+        await Runner.WithContext(
+                r => new Managing_orders_steps(
+                    new TestWebApplicationFactory(
+                        r.Resolve<FeatureTestAppConfigurations>(),
+                        r.Resolve<AccountServiceMock>(),
+                        r.Resolve<MessageBusMock>())
+                )
+            )
             .RunScenarioAsync(
                 s => s.Given_not_exist_order_with_id_ORDERID(orderId),
                 s => s.Given_registered_user_account(TestAccounts.JohnDoe),
