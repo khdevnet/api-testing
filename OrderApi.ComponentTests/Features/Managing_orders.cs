@@ -47,7 +47,8 @@ public class Managing_orders : Base_feature
                     new TestWebApplicationFactory(
                         r.Resolve<FeatureTestAppConfigurations>(),
                         r.Resolve<AccountServiceMock>(),
-                        r.Resolve<MessageBusMock>())
+                        r.Resolve<MessageBusMock>()
+                    )
                 )
             )
             .RunScenarioAsync(
