@@ -16,6 +16,10 @@
     <PackageReference Include="Moq" />
     <PackageReference Include="RestEase" />
     <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="StyleCop.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Testcontainers.MsSql" />
     <PackageReference Include="WireMock.Net" />
     <PackageReference Include="xunit.runner.visualstudio">

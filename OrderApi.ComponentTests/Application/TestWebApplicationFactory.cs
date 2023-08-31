@@ -1,26 +1,25 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
 using OrderApi.ComponentTests.Application.Clients;
 using OrderApi.ComponentTests.Application.Infrastructure;
+using OrderApi.ComponentTests.Application.Infrastructure.AccountService;
 using OrderApi.ComponentTests.LightBDD;
+using OrderApi.Core;
+using OrderApi.Infrastructure.ExternalServices.Notifications.Sms;
+using OrderApi.Infrastructure.ExternalServices.Notifications.Whatsup;
 using RestEase;
 using Serilog;
 using SharedKernal;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Moq;
-using OrderApi.ComponentTests.Application.Infrastructure.AccountService;
-using OrderApi.Core;
-using OrderApi.Core.ExternalServices.SmsService;
-using OrderApi.Infrastructure.ExternalServices.Notifications.Sms;
-using OrderApi.Infrastructure.ExternalServices.Notifications.Whatsup;
 
 namespace OrderApi.ComponentTests.Application;
 
@@ -33,13 +32,6 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
     {
         new HttpRequestLogAsCommentDelegatingHandler(new LightBDDTestLogger<HttpRequestLogAsCommentDelegatingHandler>()), new HttpRequestToCurlDelegatingHandler()
     };
-
-    public IOrdersClient OrdersClient { get; }
-    public AccountServiceMock AccountClientMock { get; }
-    public MessageBusMock MessageBusMock { get; }
-    public Mock<ISmsProvider> SmsProviderMock { get; } = new();
-    public Mock<IWhatsupProvider> WhatsupProviderMock { get; } = new();
-    public Mock<IOrderIdGenerator> OrderIdGeneratorMock { get; } = new();
 
     public TestWebApplicationFactory(
         TestAppConfigurations testAppConfigurationsProvider,
@@ -60,6 +52,18 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             .Setup(m => m.Send(It.IsAny<MessageRequest>()))
             .Returns(Task.CompletedTask);
     }
+
+    public IOrdersClient OrdersClient { get; }
+
+    public AccountServiceMock AccountClientMock { get; }
+
+    public MessageBusMock MessageBusMock { get; }
+
+    public Mock<ISmsProvider> SmsProviderMock { get; } = new();
+
+    public Mock<IWhatsupProvider> WhatsupProviderMock { get; } = new();
+
+    public Mock<IOrderIdGenerator> OrderIdGeneratorMock { get; } = new();
 
     public HttpClient CreateClientWithLogger()
     {

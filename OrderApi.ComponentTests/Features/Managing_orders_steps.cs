@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
 using LightBDD.Framework;
 using LightBDD.Framework.Messaging;
@@ -8,7 +7,6 @@ using LightBDD.Framework.Parameters;
 using LightBDD.Framework.Scenarios;
 using OrderApi.ComponentTests.Application.Clients;
 using OrderApi.ComponentTests.Application;
-using OrderApi.Core.Domain;
 using OrderApi.Models;
 using OrderApi.Core.Messages;
 using SharedKernal;
@@ -31,9 +29,6 @@ internal class Managing_orders_steps : Base_api_steps, IDisposable
     private State<Guid> _accountId;
     private State<Guid> _orderId;
 
-    public TestWebApplicationFactory App { get; }
-
-    // Uses DI container to resolve these dependencies
     public Managing_orders_steps(
         TestWebApplicationFactory app)
     {
@@ -42,6 +37,8 @@ internal class Managing_orders_steps : Base_api_steps, IDisposable
         _messageBusListener = MessageListener.Start(app.MessageBusMock);
         App = app;
     }
+
+    public TestWebApplicationFactory App { get; }
 
     public Task Given_registered_user_account(InputTree<UserAccount> account)
     {

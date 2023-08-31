@@ -12,6 +12,10 @@
     <PackageReference Include="Microsoft.FeatureManagement" />
     <PackageReference Include="RestEase" />
     <PackageReference Include="RestEase.HttpClientFactory" />
+    <PackageReference Include="StyleCop.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

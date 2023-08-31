@@ -14,6 +14,8 @@ public record OrderProduct
     }
 
     public Guid OrderId { get; init; }
+
     public string Name { get; init; }
+
     public Order Order { get; init; }
 }

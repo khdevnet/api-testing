@@ -8,6 +8,7 @@ public class ApplyMigrationsPostStartup : IHostedService
 {
     private readonly IServiceProvider _provider;
     private static readonly SemaphoreSlim _lock = new(1, 1);
+
     public ApplyMigrationsPostStartup(IServiceProvider provider) => _provider = provider;
 
     public async Task StartAsync(CancellationToken cancellationToken)
